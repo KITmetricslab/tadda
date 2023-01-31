@@ -2,7 +2,7 @@
 
 Some code on the TADDA score used in armed conflict forecasting
 
-Contents:
+### Contents
 
 * Illustration: codes to reproduce illustrative figures and small simulation examples.
 * Empirical example: probabilistic forecasts for selected countries per month
