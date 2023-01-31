@@ -19,7 +19,6 @@ log_change_fatalities_postpatch_selected <- list()
 par(mfrow=c(6,2)) 
 
 for (i in 1:6){
-  i <- 6
   # selected countries
   country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia") [i]
   
@@ -39,11 +38,4 @@ for (i in 1:6){
   log_change_fatalities_postpatch_selected[[i]] <- log( (ged_cm_postpatch_selected$fatalities[2:n] + 1) / (ged_cm_postpatch_selected$fatalities[1:n-1] + 1 ))
   plot(ged_cm_postpatch_selected$month_id, ged_cm_postpatch_selected$fatalities, xlab = "month ID", ylab = "fatalities per month", xlim = c(100,500), main = country_name_selected)
   plot(ged_cm_postpatch_selected$month_id[2:n], log_change_fatalities_postpatch_selected[[i]], xlab = "month ID", ylab = "log change", xlim = c(100,500), main = country_name_selected)
-}
-
-par(mfrow=c(6,2)) 
-
-for (i in 1:6) {
-  plot(ged_cm_postpatch_selected$month_id[[i]], ged_cm_postpatch_selected$fatalities[[i]], xlab = "month ID", ylab = "fatalities per month", xlim = c(100,500), main = country_name_selected)
-  plot(ged_cm_postpatch_selected$month_id[[i]][2:n], log_change_fatalities_postpatch_selected[[i]], xlab = "month ID", ylab = "log change", xlim = c(100,500), main = country_name_selected)
 }
