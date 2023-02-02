@@ -1,3 +1,7 @@
+## Code for data preparation of empirical example
+# Lotta Rüter
+# lotta.rueter@kit.edu
+
 # load packages
 library(arrow) # parquet data
 library(dplyr) # data manipulation
