@@ -43,17 +43,16 @@ ged_cm_postpatch <- ged_cm_postpatch %>%
 
 data_fatalities <- merge(month_country_information, ged_cm_postpatch, by = c("country_id", "month_id"))
 
-fatalities <- list()
 
 for (i in 1:length(country_name_selected)) {
-  fatalities[[i]] <-
+  fatalities_df <-
     data_fatalities[which(data_fatalities$country_name == country_name_selected[i]),
                     c("month_id", "month", "year", "fatalities")]
   
-  fatalities_log_changes <- lapply(1:7, function(s_ahead) {compute_log_change(fatalities[[i]]$fatalities, s_ahead)})
+  fatalities_log_changes <- lapply(1:7, function(s_ahead) {compute_log_change(fatalities_df$fatalities, s_ahead)})
   names(fatalities_log_changes) <- c("log_change_s1", "log_change_s2", "log_change_s3", "log_change_s4", "log_change_s5", "log_change_s6", "log_change_s7")
   
-  fatalities[[i]] <- cbind(fatalities[[i]], as.data.frame(do.call(cbind, fatalities_log_changes)))
-  write.csv2(fatalities[[i]], paste("fatalities_", country_name_selected[i], ".csv", sep = "")) # sep = ";"
+  fatalities_df <- cbind(fatalities_df, as.data.frame(do.call(cbind, fatalities_log_changes)))
+  write.csv2(fatalities_df, paste("fatalities_", country_name_selected[i], ".csv", sep = "")) # sep = ";"
 }
 
