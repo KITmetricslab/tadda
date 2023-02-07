@@ -16,13 +16,13 @@ source("bayes_acts_functions.R")
 # country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia")
 country_name_selected <- as.vector(read.csv2(paste("Data/country_name_selected.csv", sep = ""))$x)
 
-mean_loss_table_uninformed <- mean_loss_table_informed <- list()
+mean_loss_table_uninformed <- mean_loss_table_informed <- mean_loss_table_informed_small <- list()
 
 for (country in 1:length(country_name_selected)) {
-  data_fatalities <- read.csv2(paste("Data/fatalities_", country_name_selected[27], ".csv", sep = ""))
+  data_fatalities <- read.csv2(paste("Data/fatalities_", country_name_selected[country], ".csv", sep = ""))
   
   epsilon <- 0.048
-  window_length <- 10 # use data of the past 2 years for predictions
+  window_length <- 11 # use data of the past 2 years for predictions
   
   # theoretical bayes acts of last 24 observations
   # 1 step-ahead forecast
@@ -37,6 +37,7 @@ for (country in 1:length(country_name_selected)) {
     window_begin <- i+1 # first order log-change is only available from t=2 onwards
     window_end <- i+window_length
     log_change_distribution <- data_fatalities$log_change_s1[window_begin:window_end]
+    # log_change_distribution <- rep(log_change_distribution, 1:window_length) # weigh observations (most recent ones more often contained in distribution)
     BA_analytical_uninformed[i,] <- c(data_fatalities$month_id[window_end+1], # use bayes acts of past 23 log changes as prediction for observation t+1
                                       compute_bayes_acts(log_change_distribution, epsilon))
   }
@@ -47,6 +48,7 @@ for (country in 1:length(country_name_selected)) {
     window_end <- i+window_length
     fatalities_window <- data_fatalities$fatalities[window_begin:(window_end-1)]
     log_change_distribution <- log(fatalities_window+1) - log(data_fatalities$fatalities[window_end]+1) # use last observed value as reference point for log change distribution
+    # log_change_distribution <- rep(log_change_distribution, 1:window_length) # weigh observations (most recent ones more often contained in distribution)
     BA_analytical_informed[i,] <- c(data_fatalities$month_id[window_end+1], # prediction for t+1
                                     compute_bayes_acts(log_change_distribution, epsilon))
   }
@@ -54,13 +56,47 @@ for (country in 1:length(country_name_selected)) {
   # compute mean losses
   y_true <- unlist(data_fatalities %>% filter(month_id %in% BA_analytical_informed$month_id) %>% select(log_change_s1))
   
-  loss_tables_uninformed <- loss_tables(BA_analytical_uninformed[,-1], y_true, epsilon)
-  loss_tables_informed <- loss_tables(BA_analytical_informed[,-1], y_true, epsilon)
+  # loss_tables_uninformed <- loss_tables(BA_analytical_uninformed[,-1], y_true, epsilon)
+  # loss_tables_informed <- loss_tables(BA_analytical_informed[,-1], y_true, epsilon)
   
-  mean_loss_table_uninformed[[country]] <- mean_loss_table(BA_analytical_uninformed[,-1], y_true, epsilon); mean_loss_table_uninformed
-  mean_loss_table_informed[[country]] <- mean_loss_table(BA_analytical_informed[,-1], y_true, epsilon); mean_loss_table_informed
+  # mean_loss_table_uninformed_small[[country]] <- mean_loss_table_small(BA_analytical_uninformed[,-1], y_true, epsilon); mean_loss_table_uninformed
+
+    mean_loss_table_informed_small[[country]] <- mean_loss_table_small(BA_analytical_informed[,4:6], y_true, epsilon)
+  
+  # mean_loss_table_uninformed[[country]] <- mean_loss_table(BA_analytical_uninformed[,-1], y_true, epsilon); mean_loss_table_uninformed
+  # mean_loss_table_informed[[country]] <- mean_loss_table(BA_analytical_informed[,-1], y_true, epsilon); mean_loss_table_informed
   
 }
+
+# relative probs of optima per prediction for MTADDA1_L1 loss
+probs_MTADDA1_L1 <-
+  c(sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_TADDA1_L1", x[1,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_TADDA2_L1", x[1,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_SE", x[1,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("No_Change", x[1,5], fixed = TRUE))))/length(country_name_selected)
+  )
+
+# relative probs of optima per prediction for MTADDA2_L1 loss
+probs_MTADDA2_L1 <-
+  c(sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_TADDA1_L1", x[2,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_TADDA2_L1", x[2,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_SE", x[2,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("No_Change", x[2,5], fixed = TRUE))))/length(country_name_selected)
+  )
+
+# relative probs of optima per prediction for MSE loss
+probs_MSE <-
+  c(sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_TADDA1_L1", x[3,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_TADDA2_L1", x[3,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("BA_SE", x[3,5], fixed = TRUE))))/length(country_name_selected),
+    sum(unlist(lapply(mean_loss_table_informed_small, function(x) grepl("No_Change", x[3,5], fixed = TRUE))))/length(country_name_selected)
+  )
+
+emp_prob <- rbind(probs_MTADDA1_L1, probs_MTADDA2_L1, probs_MSE)
+colnames(emp_prob) <- c("BA_TADDA1_L1", "BA_TADDA2_L1", "BA_SE", "No_Change")
+rownames(emp_prob) <- c("MTADDA1_L1", "MTADDA2_L1", "MSE"); emp_prob
+
+
 
 
 ## Plots where we can ain't see nothin' yet -> choose different plotting window
