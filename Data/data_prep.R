@@ -1,3 +1,7 @@
+## Code for data preparation of empirical example
+# Lotta Rüter
+# lotta.rueter@kit.edu
+
 # load packages
 library(arrow) # parquet data
 library(dplyr) # data manipulation
@@ -5,9 +9,8 @@ library(dplyr) # data manipulation
 # define function for computing the log change
 compute_log_change <- function(vector, step_ahead) {
   n <- length(vector)
-  log_change <- log(vector[(step_ahead+1):n] + 1) - log(vector[1:(n-step_ahead)] + 1)
-  log_change <- c(rep(NA, step_ahead), log_change)
-  return(log_change)
+  log_change <- c(rep(NA, step_ahead), log(vector[(step_ahead+1):n] + 1) - log(vector[1:(n-step_ahead)] + 1))
+  log_change
 }
 
 # set working directory

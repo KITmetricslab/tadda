@@ -13,9 +13,8 @@ source("Illustration/functions.R")
 source("bayes_acts_functions.R")
 
 # read in data
-country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia")
+# country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia")
 country_name_selected <- as.vector(read.csv2(paste("Data/country_name_selected.csv", sep = ""))$x)
-
 
 mean_loss_table_uninformed <- mean_loss_table_informed <- list()
 
@@ -23,7 +22,7 @@ for (country in 1:length(country_name_selected)) {
   data_fatalities <- read.csv2(paste("Data/fatalities_", country_name_selected[27], ".csv", sep = ""))
   
   epsilon <- 0.048
-  window_length <- 4 # use data of the past 2 years for predictions
+  window_length <- 10 # use data of the past 2 years for predictions
   
   # theoretical bayes acts of last 24 observations
   # 1 step-ahead forecast
@@ -63,12 +62,6 @@ for (country in 1:length(country_name_selected)) {
   
 }
 
-minimizer4_informed <- lapply(mean_loss_table_informed, function(x) x$Minimizer)
-
-minimizer5_informed <- lapply(mean_loss_table_informed, function(x) x$Minimizer)
-minimizer10_uninformed <- lapply(mean_loss_table_uninformed, function(x) x$Minimizer)
-# minimizer stats
-
 
 ## Plots where we can ain't see nothin' yet -> choose different plotting window
 ## TADDA-scores that were used in paper: TADDA1 = TADDA1_L1, TADDA2 = TADDA2_L1, each with epsilon = 0.048
@@ -96,3 +89,9 @@ lines(BA_analytical_informed$month_id, loss_tables_uninformed$TADDA2_L1$BA_TADDA
 # create nice plots
 # generalize for multi-step ahead forecast
 # check true future
+# check true future
+
+
+
+
+
