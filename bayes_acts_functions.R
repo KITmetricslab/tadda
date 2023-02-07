@@ -5,24 +5,24 @@
 
 ## L1 Bayes Acts
 BA_AE <- function(distribution_Y) {
-  median(distribution_Y)
+  median(distribution_Y, type = 4)
 }
 
 BA_TADDA_L1 <- function(distribution_Y) {
-  m <- median(distribution_Y)
+  m <- median(distribution_Y, type = 4)
   pi <- sum(sign(m) != sign(distribution_Y))/length(distribution_Y)
-  ifelse(pi<1/3, quantile(distribution_Y, 0.5 * (1 - sign(m)*pi)), 0)
+  ifelse(pi<1/3, quantile(distribution_Y, 0.5 * (1 - sign(m)*pi), type = 4), 0)
 }
 
 BA_TADDA1_L1 <- function(distribution_Y, epsilon) {
-  m <- median(distribution_Y)
+  m <- median(distribution_Y, type = 4)
   
   if(m < (-epsilon)) {
     F_minus_epsilon <- ecdf(distribution_Y)(-epsilon)
     F_epsilon <- ecdf(distribution_Y)(epsilon)
     critical_value <- F_minus_epsilon / (2 - F_epsilon)
     if (critical_value > 0.5) {
-      return(quantile(distribution_Y, 0.5*(2-F_epsilon)))
+      return(quantile(distribution_Y, 0.5*(2-F_epsilon), type = 4))
     } else {
       return(-epsilon)
     }
@@ -39,20 +39,20 @@ BA_TADDA1_L1 <- function(distribution_Y, epsilon) {
     if (critical_value >= 0.5) {
       return(epsilon)
     } else {
-      return(quantile(distribution_Y, 0.5*(1-F_minus_epsilon)))
+      return(quantile(distribution_Y, 0.5*(1-F_minus_epsilon), type = 4))
     }
   }
 }
 
 BA_TADDA2_L1 <- function(distribution_Y, epsilon) {
-  m <- median(distribution_Y)
+  m <- median(distribution_Y, type = 4)
   
   # case m < -epsilon
   if(m < (-epsilon)) {
     F_minus_epsilon <- ecdf(distribution_Y)(-epsilon)
     critical_value <- F_minus_epsilon / (2 - F_minus_epsilon)
     if (critical_value > 0.5) {
-      return(quantile(distribution_Y, 0.5*(2-F_minus_epsilon)))
+      return(quantile(distribution_Y, 0.5*(2-F_minus_epsilon), type = 4))
     } else {
       return(-epsilon)
     }
@@ -68,7 +68,7 @@ BA_TADDA2_L1 <- function(distribution_Y, epsilon) {
     if (critical_value >= 0.5) {
       return(epsilon)
     } else {
-      return(quantile(distribution_Y, 0.5*(1 - F_epsilon)))
+      return(quantile(distribution_Y, 0.5*(1 - F_epsilon), type = 4))
     }
   }
 }
@@ -230,3 +230,27 @@ mean_loss_table <- function(y_hat, y_true, epsilon) {
   
   loss_table
 }
+
+# overview loss table (small, only includes TADDA variants that were employed in prediction competition)
+mean_loss_table_small <- function(y_hat, y_true, epsilon) {
+  y_hat <- data.frame(y_hat, "No_Change" = 0) # add no-change baseline
+  loss_TADDA1_L1 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L1_v1)
+  loss_TADDA2_L1 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L1_v2)
+  loss_SE <- loss(y_hat, y_true, SE)
+
+  loss_table <- rbind(colMeans(loss_TADDA1_L1), colMeans(loss_TADDA2_L1), colMeans(loss_SE))
+  
+  row_minima <- apply(loss_table, 1, min)
+  minimizer <- c()
+  
+  for (r in 1:nrow(loss_table)) {
+    minimizer[r] <- paste(colnames(y_hat)[which(loss_table[r,]%in%row_minima[r])], collapse=', ')
+  }
+  
+  loss_table <- data.frame(loss_table, "Minimizer" = minimizer)
+  rownames(loss_table) <- c("MTADDA1_L1", "MTADDA2_L1", "MSE")
+  
+  loss_table
+}
+
+
