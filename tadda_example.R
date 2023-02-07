@@ -1,41 +1,98 @@
-# install and load packages
-install.packages("arrow")
-library(arrow) # parquet data
-library(dplyr) # data manipulation
+### Code for empirical example illustrating properties of forecasts for log changes of armed conflict fatalities using TADDA variants, MAE or MSE
+# Lotta Rüter
+# lotta.rueter@kit.edu
+
+library(dplyr)
 
 # set working directory
-current_path = rstudioapi::getActiveDocumentContext()$path # get the path of your current open file
+current_path = rstudioapi::getActiveDocumentContext()$path # get path of this file
 setwd(dirname(current_path))
 
+# get scoring functions
+source("Illustration/functions.R")
+source("bayes_acts_functions.R")
+
 # read in data
-ged_cm_prepatch <- read_parquet('ged_cm_prepatch.parquet') %>% # ? noch nicht aufbereitet
-  mutate("fatalities" = rowSums(select(., starts_with("ged_best"))))
-ged_cm_postpatch <- read_parquet('ged_cm_postpatch.parquet') %>% # ? aufbereitete Daten?!
-  mutate("fatalities" = rowSums(select(., starts_with("ged_best"))))
-skeleton_cm_africa <- read_parquet('skeleton_cm_africa.parquet')
+country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia")
+country_name_selected <- as.vector(read.csv2(paste("Data/country_name_selected.csv", sep = ""))$x)
 
-log_change_fatalities_postpatch_selected <- list()
 
-par(mfrow=c(6,2)) 
+mean_loss_table_uninformed <- mean_loss_table_informed <- list()
 
-for (i in 1:6){
-  # selected countries
-  country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia") [i]
+for (country in 1:length(country_name_selected)) {
+  data_fatalities <- read.csv2(paste("Data/fatalities_", country_name_selected[27], ".csv", sep = ""))
   
-  # extract data of selected country
-  country_id_selected <- unique((skeleton_cm_africa %>%
-                                   filter(country_name %in% country_name_selected))$country_id)
+  epsilon <- 0.048
+  window_length <- 4 # use data of the past 2 years for predictions
   
-  ged_cm_prepatch_selected <- ged_cm_prepatch %>%
-    filter(country_id %in% country_id_selected)
-  ged_cm_postpatch_selected <- ged_cm_postpatch %>%
-    filter(country_id %in% country_id_selected)
-  n <- length(ged_cm_postpatch_selected$fatalities)
+  # theoretical bayes acts of last 24 observations
+  # 1 step-ahead forecast
+  BA_analytical_uninformed <- BA_analytical_informed <- data.frame(matrix(nrow = 0, ncol = 9))
+  colnames(BA_analytical_uninformed) <- colnames(BA_analytical_informed) <- 
+    c("month_id",
+      "BA_AE", "BA_TADDA_L1", "BA_TADDA1_L1", "BA_TADDA2_L1",
+      "BA_SE", "BA_TADDA_L2", "BA_TADDA1_L2", "BA_TADDA2_L2")
   
-  # beginnt erst bei 108
-  # endet bei 498
+  # case 1: using the log change distribution of the window directly (uninformed)
+  for (i in 1:(length(data_fatalities$fatalities)-window_length-1)) {
+    window_begin <- i+1 # first order log-change is only available from t=2 onwards
+    window_end <- i+window_length
+    log_change_distribution <- data_fatalities$log_change_s1[window_begin:window_end]
+    BA_analytical_uninformed[i,] <- c(data_fatalities$month_id[window_end+1], # use bayes acts of past 23 log changes as prediction for observation t+1
+                                      compute_bayes_acts(log_change_distribution, epsilon))
+  }
   
-  log_change_fatalities_postpatch_selected[[i]] <- log( (ged_cm_postpatch_selected$fatalities[2:n] + 1) / (ged_cm_postpatch_selected$fatalities[1:n-1] + 1 ))
-  plot(ged_cm_postpatch_selected$month_id, ged_cm_postpatch_selected$fatalities, xlab = "month ID", ylab = "fatalities per month", xlim = c(100,500), main = country_name_selected)
-  plot(ged_cm_postpatch_selected$month_id[2:n], log_change_fatalities_postpatch_selected[[i]], xlab = "month ID", ylab = "log change", xlim = c(100,500), main = country_name_selected)
+  # case 2: constructing the log change distribution based on current observation and past fatalities (informed)
+  for (i in 1:(length(data_fatalities$fatalities)-window_length-1)) {
+    window_begin <- i
+    window_end <- i+window_length
+    fatalities_window <- data_fatalities$fatalities[window_begin:(window_end-1)]
+    log_change_distribution <- log(fatalities_window+1) - log(data_fatalities$fatalities[window_end]+1) # use last observed value as reference point for log change distribution
+    BA_analytical_informed[i,] <- c(data_fatalities$month_id[window_end+1], # prediction for t+1
+                                    compute_bayes_acts(log_change_distribution, epsilon))
+  }
+  
+  # compute mean losses
+  y_true <- unlist(data_fatalities %>% filter(month_id %in% BA_analytical_informed$month_id) %>% select(log_change_s1))
+  
+  loss_tables_uninformed <- loss_tables(BA_analytical_uninformed[,-1], y_true, epsilon)
+  loss_tables_informed <- loss_tables(BA_analytical_informed[,-1], y_true, epsilon)
+  
+  mean_loss_table_uninformed[[country]] <- mean_loss_table(BA_analytical_uninformed[,-1], y_true, epsilon); mean_loss_table_uninformed
+  mean_loss_table_informed[[country]] <- mean_loss_table(BA_analytical_informed[,-1], y_true, epsilon); mean_loss_table_informed
+  
 }
+
+minimizer4_informed <- lapply(mean_loss_table_informed, function(x) x$Minimizer)
+
+minimizer5_informed <- lapply(mean_loss_table_informed, function(x) x$Minimizer)
+minimizer10_uninformed <- lapply(mean_loss_table_uninformed, function(x) x$Minimizer)
+# minimizer stats
+
+
+## Plots where we can ain't see nothin' yet -> choose different plotting window
+## TADDA-scores that were used in paper: TADDA1 = TADDA1_L1, TADDA2 = TADDA2_L1, each with epsilon = 0.048
+plot(BA_analytical_informed$month_id, BA_analytical_informed$BA_SE, type = "l", col = "red", xlab = "Month ID", ylab = "log change")
+lines(BA_analytical_informed$month_id, BA_analytical_informed$BA_TADDA1_L1, type = "l", col = "blue")
+lines(BA_analytical_informed$month_id, BA_analytical_informed$BA_TADDA2_L1, type = "l", col = "green")
+lines(BA_analytical_informed$month_id, y_true, type = "l", col = "black")
+
+# plot for SE loss given different predictions optimised for SE, TADDA1_L1 and TADDA2_L1
+plot(BA_analytical_informed$month_id, loss_tables_uninformed$SE$BA_SE, type = "l", col = "red", xlab = "Month ID", ylab = "loss")
+lines(BA_analytical_informed$month_id, loss_tables_uninformed$SE$BA_TADDA1_L1, type = "l", col = "blue", xlab = "Month ID", ylab = "loss")
+lines(BA_analytical_informed$month_id, loss_tables_uninformed$SE$BA_TADDA2_L1, type = "l", col = "green", xlab = "Month ID", ylab = "loss")
+
+# plot for TADDA1_L1 loss given different predictions optimised for SE, TADDA1_L1 and TADDA2_L1
+plot(BA_analytical_informed$month_id, loss_tables_uninformed$TADDA1_L1$BA_SE, type = "l", col = "red", xlab = "Month ID", ylab = "loss")
+lines(BA_analytical_informed$month_id, loss_tables_uninformed$TADDA1_L1$BA_TADDA1_L1, type = "l", col = "blue", xlab = "Month ID", ylab = "loss")
+lines(BA_analytical_informed$month_id, loss_tables_uninformed$TADDA1_L1$BA_TADDA2_L1, type = "l", col = "green", xlab = "Month ID", ylab = "loss")
+
+# plot for TADDA2_L1 loss given different predictions optimised for SE, TADDA1_L1 and TADDA2_L1
+plot(BA_analytical_informed$month_id, loss_tables_uninformed$TADDA2_L1$BA_SE, type = "l", col = "red", xlab = "Month ID", ylab = "loss")
+lines(BA_analytical_informed$month_id, loss_tables_uninformed$TADDA2_L1$BA_TADDA1_L1, type = "l", col = "blue", xlab = "Month ID", ylab = "loss")
+lines(BA_analytical_informed$month_id, loss_tables_uninformed$TADDA2_L1$BA_TADDA2_L1, type = "l", col = "green", xlab = "Month ID", ylab = "loss")
+
+## To do:
+# create nice plots
+# generalize for multi-step ahead forecast
+# check true future
