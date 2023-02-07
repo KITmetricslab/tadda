@@ -15,17 +15,33 @@ current_path = rstudioapi::getActiveDocumentContext()$path # get the path of you
 setwd(dirname(current_path))
 
 # read in & extract relevant data
-country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia")
-skeleton_cm_africa <- read_parquet('skeleton_cm_africa.parquet') %>%
-  filter(country_name %in% country_name_selected)
+## variant 1: select only a few African countries
+## ----
+# country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia")
+# write.csv2(country_name_selected, "country_name_selected.csv2")
+# skeleton_cm_africa <- read_parquet('skeleton_cm_africa.parquet') %>%
+#   filter(country_name %in% country_name_selected)
 
-country_id_selected <- unique((skeleton_cm_africa %>%
-                                 filter(country_name %in% country_name_selected))$country_id)
+# country_id_selected <- unique((skeleton_cm_africa %>%
+#                                  filter(country_name %in% country_name_selected))$country_id)
 
+# ged_cm_postpatch <- read_parquet('ged_cm_postpatch.parquet') %>%
+#   mutate("fatalities" = rowSums(select(., starts_with("ged_best")))) %>%
+#   filter(country_id %in% country_id_selected) %>%
+#   select(country_id, month_id, fatalities)
+## ----
+
+## variant 2: select all African countries
+## ----
+skeleton_cm_africa <- read_parquet('skeleton_cm_africa.parquet') # contains data on only African countries
 ged_cm_postpatch <- read_parquet('ged_cm_postpatch.parquet') %>% 
   mutate("fatalities" = rowSums(select(., starts_with("ged_best")))) %>%
-  filter(country_id %in% country_id_selected) %>%
+  filter(country_id %in% skeleton_cm_africa$country_id) %>%
   select(country_id, month_id, fatalities)
+country_name_selected <- unique(skeleton_cm_africa$country_name)
+write.csv2(country_name_selected, "country_name_selected.csv")
+
+## ----
 
 # only include observations with fatalities != NA
 # discard last 3 months since they weren't included in the requested true future horizon of the competition
