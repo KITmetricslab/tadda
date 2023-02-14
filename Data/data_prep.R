@@ -17,58 +17,39 @@ compute_log_change <- function(vector, step_ahead) {
 current_path = rstudioapi::getActiveDocumentContext()$path # get the path of your current open file
 setwd(dirname(current_path))
 
-# read in & extract relevant data
-## variant 1: select only a few African countries
-## ----
-# country_name_selected <- c("Mozambique", "Sudan", "Congo, DRC", "Mali", "Nigeria", "Somalia")
-# write.csv2(country_name_selected, "country_name_selected.csv2")
-# skeleton_cm_africa <- read_parquet('skeleton_cm_africa.parquet') %>%
-#   filter(country_name %in% country_name_selected)
-
-# country_id_selected <- unique((skeleton_cm_africa %>%
-#                                  filter(country_name %in% country_name_selected))$country_id)
-
-# ged_cm_postpatch <- read_parquet('ged_cm_postpatch.parquet') %>%
-#   mutate("fatalities" = rowSums(select(., starts_with("ged_best")))) %>%
-#   filter(country_id %in% country_id_selected) %>%
-#   select(country_id, month_id, fatalities)
-## ----
-
-## variant 2: select all African countries
-## ----
+# read in & extract relevant data of all African countries
 skeleton_cm_africa <- read_parquet('skeleton_cm_africa.parquet') # contains data on only African countries
 ged_cm_postpatch <- read_parquet('ged_cm_postpatch.parquet') %>% 
-  mutate("fatalities" = rowSums(select(., starts_with("ged_best")))) %>%
   filter(country_id %in% skeleton_cm_africa$country_id) %>%
-  select(country_id, month_id, fatalities)
-country_name_selected <- unique(skeleton_cm_africa$country_name)
-write.csv2(country_name_selected, "country_name_selected.csv")
+  select(country_id, month_id, ged_best_sb) %>%
+  rename("fatalities" = "ged_best_sb") %>%
+  arrange(month_id) %>%
+  arrange(country_id)
 
-## ----
-
-# only include observations with fatalities != NA
-# discard last 3 months since they weren't included in the requested true future horizon of the competition
-months_available <- head(unique(ged_cm_postpatch$month_id[which(!is.na(ged_cm_postpatch$fatalities))]),-3)
+months_used <- 400:495
 
 month_country_information <-
-  skeleton_cm_africa %>% filter(month_id %in% months_available) %>% distinct %>% select(-in_africa)
+  skeleton_cm_africa %>% filter(month_id %in% months_used) %>% distinct %>% select(-in_africa)
 
 ged_cm_postpatch <- ged_cm_postpatch %>%
-  filter(month_id %in% months_available)
+  filter(month_id %in% months_used)
 
-data_fatalities <- merge(month_country_information, ged_cm_postpatch, by = c("country_id", "month_id"))
+data_merged <- merge(month_country_information, ged_cm_postpatch, by = c("country_id", "month_id"))
 
-fatalities <- list()
+n <- nrow(data_merged)
+n_month <- length(months_used)
 
-for (i in 1:length(country_name_selected)) {
-  fatalities[[i]] <-
-    data_fatalities[which(data_fatalities$country_name == country_name_selected[i]),
-                    c("month_id", "month", "year", "fatalities")]
-  
-  fatalities_log_changes <- lapply(1:7, function(s_ahead) {compute_log_change(fatalities[[i]]$fatalities, s_ahead)})
-  names(fatalities_log_changes) <- c("log_change_s1", "log_change_s2", "log_change_s3", "log_change_s4", "log_change_s5", "log_change_s6", "log_change_s7")
-  
-  fatalities[[i]] <- cbind(fatalities[[i]], as.data.frame(do.call(cbind, fatalities_log_changes)))
-  write.csv2(fatalities[[i]], paste("fatalities_", country_name_selected[i], ".csv", sep = "")) # sep = ";"
+data_fatalities <- data.frame(matrix(ncol = 13, nrow = n))
+colnames(data_fatalities) <- c("country_name", "country_id", "month_id", "month", "year", "fatalities", "log_change_s1", "log_change_s2", "log_change_s3", "log_change_s4", "log_change_s5", "log_change_s6", "log_change_s7")
+data_fatalities[,1:6] <- data_merged[,c("country_name", "country_id", "month_id", "month", "year", "fatalities")]
+
+# compute log-changes
+for (i in 1:length(unique(data_merged$country_name))) {
+  country <- unique(data_merged$country_name)[i]
+  data_country <- data_merged %>% filter(country_name == country)
+  log_changes <- lapply(1:7, function(s) {compute_log_change(data_country$fatalities, s)})
+  data_fatalities[which(data_fatalities$country_name == country), 7:13] <- list.cbind(log_changes)
 }
 
+data_fatalities <- data_fatalities # %>% filter(month_id >= 426) # observation 445-12-7 required for log-change distributions of s7-step ahead forecast of uninformed variant
+write.csv(data_fatalities, "data_fatalities.csv")

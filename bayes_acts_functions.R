@@ -2,7 +2,9 @@
 # Lotta Rüter
 # lotta.rueter@kit.edu
 
-
+# ----
+### BAYES ACTS
+# ----
 ## L1 Bayes Acts
 BA_AE <- function(distribution_Y) {
   median(distribution_Y, type = 4)
@@ -133,124 +135,83 @@ BA_TADDA2_L2 <- function(distribution_Y, epsilon) {
   }
 }
 
-# table of all bayes acts
-compute_bayes_acts <- function(distribution_Y, epsilon) {
-  c(
-    BA_AE(distribution_Y),
-    BA_TADDA_L1(distribution_Y),
-    BA_TADDA1_L1(distribution_Y, epsilon),
-    BA_TADDA2_L1(distribution_Y, epsilon),
-    BA_SE(distribution_Y),
-    BA_TADDA_L2(distribution_Y),
-    BA_TADDA1_L2(distribution_Y, epsilon),
-    BA_TADDA2_L2(distribution_Y, epsilon)
+# ----
+### SUMMARY FUNCTIONS
+# ----
+
+# bayes acts of SE, TADDA1_L1, TADDA2_L1
+bayes_acts <- function(distribution_Y, epsilon) {
+  data.frame(
+    "BA_SE" = BA_SE(distribution_Y),
+    "BA_TADDA1_L1" = BA_TADDA1_L1(distribution_Y, epsilon),
+    "BA_TADDA2_L1" = BA_TADDA2_L1(distribution_Y, epsilon)
   )
 }
 
-# # scores as loss functions
-# loss <- function(y_hat, y_true, score) {
-#   loss <- data.frame(matrix(nrow = 0, ncol = ncol(y_hat)))
-#   colnames(loss) <- colnames(y_hat)
-#   for (i in 1:nrow(y_hat)) {
-#     for (j in 1:ncol(y_hat)) {
-#       loss[i,j] <- score(y_hat[i,j], y_true[i])
-#     }
-#   }
-#   loss
-# }
-
-# scores as loss functions
-loss <- function(y_hat, y_true, score) {
-  loss <- data.frame(matrix(nrow = 0, ncol = ncol(y_hat)))
-  colnames(loss) <- colnames(y_hat)
-  for (i in 1:nrow(y_hat)) {
-    for (j in 1:ncol(y_hat)) {
-      loss[i,j] <- score(y_hat[i,j], y_true[i])
-    }
-  }
-  loss
+# predictions for rolling windows
+bayes_acts_predictions <- function(variant = "informed", data_c = data_country, s = step_ahead, w_length = window_length, eps = epsilon) {
+  if(variant == "uninformed") {
+    col_name <- paste("log_change_s", s, sep = "")
+    predictions <- lapply(1:(nrow(data_c)-w_length), function(w_begin) {
+      log_change_distribution <- data_c[w_begin:(w_begin + w_length - 1), col_name]
+      preds <- data.frame("month_id" = data_c$month_id[w_begin + w_length + s - 1], bayes_acts(log_change_distribution, eps))
+      colnames(preds) <- c("month_id", paste(colnames(preds)[2:ncol(preds)], "_s", s, sep = ""))
+      rownames(preds) <- NULL
+      preds
+      })
+  } else if(variant == "informed") {
+    predictions <- lapply(1:(nrow(data_c)-w_length-s), function(w_begin) {
+      w_end <- w_begin + w_length - 1
+      fatalities_w <- data_c$fatalities[w_begin:w_end]
+      log_change_distribution <- log(fatalities_w + 1) - log(tail(fatalities_w, 1) + 1) # use last observed value as reference point for log change distribution
+      preds <- data.frame("month_id" = data_c$month_id[w_end + s], bayes_acts(log_change_distribution, eps))
+      colnames(preds) <- c("month_id", paste(colnames(preds)[2:ncol(preds)], "_s", s, sep = ""))
+      rownames(preds) <- NULL
+      preds
+    }) 
+  } else if(variant == "combined") { # does not work very well -> discard it
+      predictions <- lapply(1:(nrow(data_c)-w_length-s), function(w_begin) {
+        combinations <- combn(data_c$fatalities[w_begin:(w_begin + w_length)], 2)# , data_c$fatalities[w_begin:(w_begin + w_length)])
+        log_change_distribution <- log(combinations[1,] + 1) - log(combinations[2,] + 1)
+        preds <- data.frame("month_id" = data_c$month_id[w_begin + w_length + s], bayes_acts(log_change_distribution, eps))
+        colnames(preds) <- c("month_id", paste(colnames(preds)[2:ncol(preds)], "_s", s, sep = ""))
+        rownames(preds) <- NULL
+        preds
+      })
+  } else { stop("variant must bei either 'informed', 'uninformed' or 'combined'") }
+  
+  bind_rows(predictions)
 }
 
-# scores as loss functions with epsilon
-loss_epsilon <- function(y_hat, y_true, epsilon, score) {
-  loss <- data.frame(matrix(nrow = 0, ncol = ncol(y_hat)))
-  colnames(loss) <- colnames(y_hat)
-  for (i in 1:nrow(y_hat)) {
-    for (j in 1:ncol(y_hat)) {
-      loss[i,j] <- score(y_hat[i,j], y_true[i], epsilon)
-    }
-  }
-  loss
+compute_losses <- function(s, loss, data_all, eps = epsilon) {
+  true_data_colname <- paste("log_change_s", s, sep = "")
+  predictions_colnames <- c(paste(BA_names, s, sep = "_s"), "No_Change")
+  if(loss == "SE") {
+    df_losses <- SE(data_all[, predictions_colnames], data_all[, true_data_colname])
+  } else if(loss == "TADDA1_L1") {
+    df_losses <- list.cbind(lapply(predictions_colnames, function(colname) TADDA_L1_v1(data_all[, colname], data_all[, true_data_colname], eps)))
+  } else if(loss == "TADDA2_L1") {
+    df_losses <- list.cbind(lapply(predictions_colnames, function(colname) TADDA_L1_v2(data_all[, colname], data_all[, true_data_colname], eps)))
+  } else { stop("'loss' must bei either 'SE', 'TADDA1_L1' or 'TADDA2_L1'")  }
+  colnames(df_losses) <- predictions_colnames
+  colnames(df_losses)[ncol(df_losses)] <- paste(colnames(df_losses)[ncol(df_losses)], "_s", s, sep = "")
+  df_losses <- cbind("month_id" = data_all$month_id, df_losses)
+  df_losses
 }
 
-# loss tables, detailed
-loss_tables <- function(y_hat, y_true, epsilon) {
-  y_hat <- data.frame(y_hat, "No_Change" = 0) # add no-change baseline
-  loss_AE <- loss(y_hat, y_true, AE)
-  loss_TADDA_L1 <- loss(y_hat, y_true, TADDA_L1)
-  loss_TADDA1_L1 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L1_v1)
-  loss_TADDA2_L1 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L1_v2)
-  
-  loss_SE <- loss(y_hat, y_true, SE)
-  loss_TADDA_L2 <- loss(y_hat, y_true, TADDA_L2)
-  loss_TADDA1_L2 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L2_v1)
-  loss_TADDA2_L2 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L2_v2)
-  
-  loss_tables_list <- list(loss_AE, loss_TADDA_L1, loss_TADDA1_L1, loss_TADDA2_L1,
-                           loss_SE, loss_TADDA_L2, loss_TADDA1_L2, loss_TADDA2_L2) 
-  names(loss_tables_list) <- c("AE", "TADDA_L1", "TADDA1_L1", "TADDA2_L1", "SE", "TADDA_L2", "TADDA1_L2", "TADDA2_L2")
-  loss_tables_list
+loss_df <- function(data_predictions, loss_fun) {
+  loss <- lapply(1:7, function(s) compute_losses(s, loss = loss_fun, data_all = data_predictions))
+  list.cbind(loss)[, !duplicated(colnames(list.cbind(loss)))]
 }
 
-# overview loss table
-mean_loss_table <- function(y_hat, y_true, epsilon) {
-  y_hat <- data.frame(y_hat, "No_Change" = 0) # add no-change baseline
-  loss_AE <- loss(y_hat, y_true, AE)
-  loss_TADDA_L1 <- loss(y_hat, y_true, TADDA_L1)
-  loss_TADDA1_L1 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L1_v1)
-  loss_TADDA2_L1 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L1_v2)
+mean_loss <- function(data_predictions, month_id_task) {
+  SE_loss_df <- loss_df(data_predictions, "SE")
+  TADDA1_L1_loss_df <- loss_df(data_predictions, "TADDA1_L1")
+  TADDA2_L1_loss_df <- loss_df(data_predictions, "TADDA2_L1")
   
-  loss_SE <- loss(y_hat, y_true, SE)
-  loss_TADDA_L2 <- loss(y_hat, y_true, TADDA_L2)
-  loss_TADDA1_L2 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L2_v1)
-  loss_TADDA2_L2 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L2_v2)
+  mean_loss_SE <- colMeans(SE_loss_df[which(SE_loss_df$month_id %in% month_id_task), ])
+  mean_loss_TADDA1_L1 <- colMeans(TADDA1_L1_loss_df[which(TADDA1_L1_loss_df[,1] %in% month_id_task), ])
+  mean_loss_TADDA2_L1 <- colMeans(TADDA2_L1_loss_df[which(TADDA2_L1_loss_df[,1] %in% month_id_task), ])
   
-  loss_table <- rbind(colMeans(loss_AE), colMeans(loss_TADDA_L1), colMeans(loss_TADDA1_L1), colMeans(loss_TADDA2_L1),
-                      colMeans(loss_SE), colMeans(loss_TADDA_L2), colMeans(loss_TADDA1_L2), colMeans(loss_TADDA2_L2))
-  
-  row_minima <- apply(loss_table, 1, min)
-  minimizer <- c()
-  
-  for (r in 1:nrow(loss_table)) {
-    minimizer[r] <- paste(colnames(y_hat)[which(loss_table[r,]%in%row_minima[r])], collapse=', ')
-  }
-  
-  loss_table <- data.frame(loss_table, "Minimizer" = minimizer)
-  rownames(loss_table) <- c("MAE", "MTADDA_L1", "MTADDA1_L1", "MTADDA2_L1", "MSE", "MTADDA_L2", "MTADDA1_L2", "MTADDA2_L2")
-  
-  loss_table
+  rbind(mean_loss_SE, mean_loss_TADDA1_L1, mean_loss_TADDA2_L1)
 }
-
-# overview loss table (small, only includes TADDA variants that were employed in prediction competition)
-mean_loss_table_small <- function(y_hat, y_true, epsilon) {
-  y_hat <- data.frame(y_hat, "No_Change" = 0) # add no-change baseline
-  loss_TADDA1_L1 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L1_v1)
-  loss_TADDA2_L1 <- loss_epsilon(y_hat, y_true, epsilon, TADDA_L1_v2)
-  loss_SE <- loss(y_hat, y_true, SE)
-
-  loss_table <- rbind(colMeans(loss_TADDA1_L1), colMeans(loss_TADDA2_L1), colMeans(loss_SE))
-  
-  row_minima <- apply(loss_table, 1, min)
-  minimizer <- c()
-  
-  for (r in 1:nrow(loss_table)) {
-    minimizer[r] <- paste(colnames(y_hat)[which(loss_table[r,]%in%row_minima[r])], collapse=', ')
-  }
-  
-  loss_table <- data.frame(loss_table, "Minimizer" = minimizer)
-  rownames(loss_table) <- c("MTADDA1_L1", "MTADDA2_L1", "MSE")
-  
-  loss_table
-}
-
-
