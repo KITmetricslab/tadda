@@ -17,52 +17,54 @@ source("Illustration/functions.R")
 source("bayes_acts_functions.R")
 
 # read in data
-data_fatalities <- read.csv(paste("Data/data_fatalities.csv"))[,-1]
+data_fatalities <- read.csv(paste("Data/fatalities.csv"))[,-1]
+country_names <- unique(data_fatalities$country_name)
 
 # set parameters & choose task windows
 epsilon <- 0.048
-window_length <- 6 # use data of the past 6 months for predictions
-month_id_task1 <- 490:495 # true future of challenge (10/20-03/21)
-month_id_task2 <- 445:480 # test set (01/17-12/19)
-window_months <- 408:495 # data contains obs. for month_id 400 onwards, 7-step ahead forecast exists for 408 onwards
+window_length <- 10 # use data of the past 9 months for predictions
 
-# TADDA-scores that were used in paper: TADDA1 = TADDA1_L1, TADDA2 = TADDA2_L1, each with epsilon = 0.048
-BA_names <- c("BA_SE", "BA_TADDA1_L1", "BA_TADDA2_L1")
+# task 1
+pred_month_id_task1 <- 490:495 # true future of challenge (10/20-03/21)
+train_month_id_task1 <- 445:488
+
+# task 2
+pred_month_id_task2 <- 445:480 # test set (01/17-12/19)
+train_month_id_task2 <- 409:444 
+
+# overall data window
+# data generally contains obs. for month_id 121 onwards, 7-step ahead forecast exists for 128 onwards; 
+# however, data for South Sudan (incl. 7 step-ahead forecast) is only available from 386 onwards so we choose 386 as the starting month
+window_months <- 386:495 
+
+# TADDA-score that was used in paper: TADDA1 = TADDA1_L1 with epsilon = 0.048
+BA_names <- c("BA_SE", "BA_TADDA1", "BA_TADDA2")
 
 # initialise objects
-predictions_uninformed <- predictions_informed <- predictions_combined <- list()
+predictions <- list()
 
 # compute predictions for each country, score and prediction horizon
-for (country in 1:length(unique(data_fatalities$country_name))) {
-  current_country_name <- unique(data_fatalities$country_name)[country]; print(current_country_name)
+for (country in 1:length(country_names)) {
+  current_country_name <- country_names[country]; print(current_country_name)
   data_country <- data_fatalities %>% filter(country_name == current_country_name) %>% filter(month_id %in% window_months)
   
-  # case 1 (uninformed): use log change distribution directly
-  list_uninformed <- lapply(1:7, function(step_ahead) bayes_acts_predictions(variant = "uninformed", s = step_ahead))
-  predictions_uninformed[[country]] <- cbind("country_name" = current_country_name, reduce(list_uninformed, full_join, by = "month_id"))
-  
-  # case 2 (informed): construct the log change distribution based on current observation and past fatalities
-  list_informed <- lapply(1:7, function(step_ahead) bayes_acts_predictions(variant = "informed", s = step_ahead))
-  predictions_informed[[country]] <- cbind("country_name" = current_country_name, reduce(list_informed, full_join, by = "month_id"))
+  # construct the log change distribution based on current observation and past fatalities
+  predictions_ls <- lapply(1:7, function(step_ahead) bayes_acts_predictions(s = step_ahead))
+  predictions[[country]] <- cbind("country_name" = current_country_name, reduce(predictions_ls, full_join, by = "month_id"))
 }
 
-# combine lists to data frame and select months that are relevant for evaluation
-data_predictions_uninformed <- merge(data_fatalities, cbind(bind_rows(predictions_uninformed), "No_Change" = 0),
-                                     by = c("country_name", "month_id")) %>% filter(month_id %in% 445:495) # 445:495 comprises both evaluation sets
-data_predictions_informed <- merge(data_fatalities, cbind(bind_rows(predictions_informed), "No_Change" = 0),
-                                     by = c("country_name", "month_id")) %>% filter(month_id %in% 445:495) # 445:495 comprises both evaluation sets
+# combine list to data frame and select months that are relevant for evaluation
+# predictions are available for (window_months[1] + window_length + s) : window
+data_predictions <- merge(data_fatalities, cbind(bind_rows(predictions), "No_Change" = 0), by = c("country_name", "month_id")) %>% 
+  select(., c("country_name", "month_id", starts_with("log_change"), starts_with("BA_SE"), starts_with("BA_TADDA1"), starts_with("BA_TADDA2"), "No_Change"))
+# write.csv(data_predictions, paste("predictions_w", window_length, ".csv", sep = ""))
 
 # compute losses for each prediction horizon and loss function
-SE_loss_uninformed_df <- loss_df(data_predictions_uninformed, "SE")
-TADDA1_L1_loss_uninformed_df <- loss_df(data_predictions_uninformed, "TADDA1_L1")
-TADDA2_L1_loss_uninformed_df <- loss_df(data_predictions_uninformed, "TADDA2_L1")
-
-SE_loss_informed_df <- loss_df(data_predictions_informed, "SE")
-TADDA1_L1_loss_informed_df <- loss_df(data_predictions_informed, "TADDA1_L1")
-TADDA2_L1_loss_informed_df <- loss_df(data_predictions_informed, "TADDA2_L1")
+loss_all <- compute_losses(data_predictions)
+# write.csv(loss_all, paste("losses_w", window_length, ".csv", sep = ""))
 
 # summarise losses
-mean_loss_uninformed_task2 <- mean_loss(data_predictions_uninformed, month_id_task2)
-mean_loss_informed_task2 <- mean_loss(data_predictions_informed, month_id_task2)
-write.csv(round(mean_loss_uninformed_task2, 3), "mean_loss_uninformed_task2.csv")
-write.csv(round(mean_loss_informed_task2, 3), "mean_loss_informed_task2.csv")
+mean_loss_task2 <- mean_loss(loss_all, pred_month_id_task2); mean_loss_task2 # task 2
+# write.csv(mean_loss_task2, paste("mean_loss_task2_w", window_length, ".csv", sep = ""))
+
+

@@ -26,7 +26,7 @@ ged_cm_postpatch <- read_parquet('ged_cm_postpatch.parquet') %>%
   arrange(month_id) %>%
   arrange(country_id)
 
-months_used <- 400:495
+months_used <- 121:495
 
 month_country_information <-
   skeleton_cm_africa %>% filter(month_id %in% months_used) %>% distinct %>% select(-in_africa)
@@ -52,4 +52,4 @@ for (i in 1:length(unique(data_merged$country_name))) {
 }
 
 data_fatalities <- data_fatalities # %>% filter(month_id >= 426) # observation 445-12-7 required for log-change distributions of s7-step ahead forecast of uninformed variant
-write.csv(data_fatalities, "data_fatalities.csv")
+write.csv(data_fatalities, "fatalities.csv")
