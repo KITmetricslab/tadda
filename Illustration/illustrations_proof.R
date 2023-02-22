@@ -53,10 +53,10 @@ text_in_box(0, 0.7, "0", col = "lightgrey")
 
 
 abline(h = pi/(1 + pi), col = "lightgrey")
-text_in_box(4, pi/(1 + pi), expression(Pr(Y < epsilon)/(1 + Pr(Y < epsilon))), col = "lightgrey")
+text_in_box(4, pi/(1 + pi), expression(Pr(Y <= 0)/(1 + Pr(Y < 0))), col = "lightgrey", cex = 0.8)
 
 abline(h = 2*pi/(1 + pi), col = "lightgrey")
-text_in_box(4, 2*pi/(1 + pi), expression(2*Pr(Y < epsilon)/(1 + (Y < epsilon))), col = "lightgrey")
+text_in_box(4, 2*pi/(1 + pi), expression((Pr(Y <= 0) + Pr(Y < 0))/(1 + Pr(Y < 0))), col = "lightgrey", cex = 0.8)
 
 
 
@@ -66,7 +66,7 @@ abline(v = med_modified, col = "red", lty  ="dashed")
 
 lines(quantiles_y, grid_p, col = "red")
 
-legend("topleft", legend = c("CDF of Y", "CDF of G"), col = c("black", "red"), lty = 1, bty = "n")
+legend("topleft", legend = c("CDF of Y", "CDF of Z"), col = c("black", "red"), lty = 1, bty = "n")
 
 text_in_box(med_modified - 0.8, 0.95, "BA: median of Z", col = "red")
 
@@ -139,8 +139,8 @@ text_in_box(epsilon, 0.7, expression(epsilon), col = "lightgrey")
 text_in_box(-epsilon, 0.7, expression(-epsilon), col = "lightgrey")
 text_in_box(med_modified, 0.95, "BA: median of Z", col = "red")
 text_in_box(med + 1.25, 0.05, "median of Y", col = "black")
-text_in_box(6, (F_epsilon +F_minus_epsilon)/(1 + F_minus_epsilon), expression((1 - Pr(Y > epsilon) + Pr(Y < -epsilon))/(1 + Pr(Y < -epsilon))), col = "lightgrey")
-text_in_box(6, F_epsilon/(1 + F_minus_epsilon), expression(Pr(Y < -epsilon)/(1 + Pr(Y < -epsilon))), col = "lightgrey")
+text_in_box(6, (F_epsilon +F_minus_epsilon)/(1 + F_minus_epsilon), expression((Pr(Y <= epsilon) + Pr(Y < -epsilon))/(1 + Pr(Y < -epsilon))), col = "lightgrey", cex = 0.8)
+text_in_box(6, F_epsilon/(1 + F_minus_epsilon), expression(Pr(Y <= epsilon)/(1 + Pr(Y < -epsilon))), col = "lightgrey", cex = 0.8)
 
 legend("topleft", legend = c("CDF of Y", "CDF of Z"), col = c("black", "red"), lty = 1, bty = "n")
 
@@ -212,9 +212,9 @@ text_in_box(3, 0.5, "0.5", col = "lightgrey")
 text_in_box(epsilon, 0.3, expression(epsilon), col = "lightgrey")
 text_in_box(-epsilon, 0.3, expression(-epsilon), col = "lightgrey")
 text_in_box(-6, F_minus_epsilon/(2 - F_epsilon), 
-            expression(Pr(Y < -epsilon)/(1 - Pr(Y > epsilon))), col = "lightgrey")
+            expression(Pr(Y <= -epsilon)/(1 + Pr(Y > epsilon))), col = "lightgrey", cex = 0.8)
 text_in_box(-5.5, (1 - F_epsilon + F_minus_epsilon)/(2 - F_epsilon),
-            expression((Pr(Y < -epsilon) + Pr(Y > epsilon))/(1 - Pr(Y > epsilon))), col = "lightgrey")
+            expression((Pr(Y <= -epsilon) + Pr(Y > epsilon))/(1 + Pr(Y > epsilon))), col = "lightgrey", cex = 0.8)
 text_in_box(med_modified + 1.6, 0.15, "BA: median of Z", col = "red")
 
 text_in_box(med, 0.95, "median of Y", col = "black")

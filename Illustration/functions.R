@@ -78,7 +78,7 @@ get_bayes_acts_wo_epsilon <- function(grid_y, samples_y, score){
 }
 
 # helper function to add text in a box to a plot:
-text_in_box <- function(x, y, txt, col){
+text_in_box <- function(x, y, txt, col, cex = 1){
   legend(x, y, txt,
          xjust = 0.5,      # 0.5 means center adjusted
          yjust = 0.5,      # 0.5 means center adjusted
@@ -87,5 +87,6 @@ text_in_box <- function(x, y, txt, col){
          adj = c(0, 0.5),
          box.col = col,
          text.col = col,
-         bg = "white")
+         bg = "white",
+         cex = cex)
 }
