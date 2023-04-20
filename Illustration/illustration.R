@@ -31,6 +31,7 @@ samples_y <- rsn(100000, xi = xi, omega = omega, alpha = alpha)
 (med <- median(samples_y))
 grid_y <- seq(from = 0, to = 0.2, by = 0.001)
 (ba_tadda1 <- get_bayes_acts(grid_y = grid_y, grid_epsilon = epsilon, samples_y = samples_y, score = TADDA_L1_v1))
+(ba_tadda2 <- get_bayes_acts(grid_y = grid_y, grid_epsilon = epsilon, samples_y = samples_y, score = TADDA_L1_v2))
 
 #####################
 ### plot density function:
@@ -58,7 +59,7 @@ abline(v = ba_tadda1, lty = 4, col = "red")
 
 legend("topright", legend = c(paste0("Mean: ", round(mu, 3)), # hard-coded, modify as needed
                               paste0("Median: ", round(med, 3)),
-                              expression(BA~under~TADDA[0.048]: 0.06)),
+                              expression(OPF~TADDA[0.048]: 0.06)),
                               # expression(BA~under~TADDA[0]: 0.019)),
        lty = c(2, 3, 4, 5), bty = "n", col = c("black", "black", "red"), cex = 0.9)
 dev.off()
@@ -212,8 +213,8 @@ ba_tadda_l2_v2_epsilon <- grid_y_hat[which.min(average_scores_tadda_l2_v2_epsilo
 
 
 expected_scores[, "value"] <- c(med, mu, 
-                                med_modified, ba_tadda_l1_v1_epsilon, ba_tadda_l1_v2_epsilon,
-                                mu_modified, ba_tadda_l2_v1_epsilon, ba_tadda_l2_v2_epsilon,
+                                ba_tadda1, ba_tadda_l1_v1_epsilon, ba_tadda_l1_v2_epsilon,
+                                ba_tadda2, ba_tadda_l2_v1_epsilon, ba_tadda_l2_v2_epsilon,
                                 0)
 
 expected_scores[, "AE"] <- sapply(expected_scores[, "value"], 
@@ -235,12 +236,9 @@ expected_scores[, "TADDA_L2_v1"] <- sapply(expected_scores[, "value"],
 expected_scores[, "TADDA_L2_v2"] <- sapply(expected_scores[, "value"],
                                            function(x) mean(TADDA_L2_v2(x, y = samples_y, epsilon = epsilon)))
 
-expected_scores_small <- rbind(expected_scores[c("median", "mean"), ],
-                               BA = NA,
+expected_scores_small <- rbind(expected_scores[c("median", "mean", "BA TADDA_L1_v1"), ],
                                zero = expected_scores["zero", ])
-expected_scores_small <- expected_scores_small[, c("AE", "SE", 
-                                                   "TADDA_L1_v1")]
-expected_scores_small["BA", ] <- diag(expected_scores[-nrow(expected_scores), -1])
+expected_scores_small <- expected_scores_small[, c("AE", "SE", "TADDA_L1_v1")]
 
 library(xtable)
 # scores:
