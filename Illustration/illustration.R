@@ -2,8 +2,6 @@
 # Johannes Bracher
 # johannes.bracher@kit.edu
 
-# setwd("/home/johannes/Documents/Ideas/armed_conflicts/tadda/Illustration")
-
 # library for skew normal
 library(sn)
 library(plotrix)
