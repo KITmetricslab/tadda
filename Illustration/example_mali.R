@@ -64,7 +64,9 @@ reference_obs <- tail(mali$fatalities, 9)
 last_obs <- tail(mali$fatalities, 1)
 reference_log_changes <- log(reference_obs + 1) - log(last_obs + 1)
 boxplot(reference_log_changes, col = "white", border = "grey", ylim = log(yl/last_value),
-        ylab = "log change", main = "")
+        ylab = "log change", main = "", axes = FALSE)
+axis(2, at = c(-2, -1, 0, 1))
+box()
 mtext(side = 3, "Forecast distribution\n for log-change")
 
 mu <- mean(reference_log_changes)
@@ -73,10 +75,10 @@ TADDA_BA <- BA_TADDA1_L1(reference_log_changes, epsilon = 0.048)
 abline(h = TADDA_BA, col = "red", lty = 4)
 abline(h = mu, col = "black", lty = 2)
 
-boxplot(reference_log_changes, col = "white", border = "grey", add = TRUE)
+boxplot(reference_log_changes, col = "white", border = "grey", add = TRUE, axes = FALSE)
 points(rep(1, length(reference_log_changes)), reference_log_changes, pch = 16, cex = 0.75)
 
 legend("bottom", legend = c(paste("Mean:", round(mu, 2)),
-                            expression(BA~under~TADDA[0.048]: 0)),
+                            expression(OPF~TADDA[0.048]: 0)),
        cex = 0.75, bty = "n", lty = c(2, 4), col = c("black", "red"))
 dev.off()
