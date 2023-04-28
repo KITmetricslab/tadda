@@ -5,6 +5,7 @@
 # load packages
 library(arrow) # parquet data
 library(dplyr) # data manipulation
+library(rlist) # functions for manipulation of lists
 
 # define function for computing the log change
 compute_log_change <- function(vector, step_ahead) {
