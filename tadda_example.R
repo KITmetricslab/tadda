@@ -2,7 +2,6 @@
 # Lotta Rüter
 # lotta.rueter@kit.edu
 
-
 # load packages
 library(tidyverse) # includes dplyr, required for "reduce" function
 library(rlist) # functions for manipulation of lists
