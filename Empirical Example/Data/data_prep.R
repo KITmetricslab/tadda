@@ -1,4 +1,8 @@
 ## Code for data preparation of empirical example
+# Extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa
+# Computes true s=1,...,7 step ahead log-changes for each country and month
+# Saves the results in "fatalities.csv"
+
 # Lotta Rüter
 # lotta.rueter@kit.edu
 
