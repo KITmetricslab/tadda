@@ -26,8 +26,8 @@ current_path = rstudioapi::getActiveDocumentContext()$path # get path of this fi
 setwd(dirname(current_path))
 
 # get scoring functions
-source("Theory/functions.R")
-source("Theory/bayes_acts_functions.R")
+source("../Simulations/functions.R")
+source("bayes_acts_functions.R")
 
 # read in data
 data_fatalities <- read.csv(paste("Data/fatalities.csv"))[,-1]
@@ -93,7 +93,7 @@ for(window_length in 1:17) { # 17 is highest possible window length, since 409-1
   loss_means_df_pred[window_length,] <- mean_loss_task2_pred[7,] # stores average loss across window
 }
 round(loss_means_df_pred[1:17,], 3)
-write.csv(round(loss_means_df_train[1:17,], 3), "average_scores_for_different_window_lengths.csv")
+write.csv(round(loss_means_df_train[1:17,], 3), "Results/average_scores_for_different_window_lengths.csv")
 # ---------------
 
 
@@ -116,7 +116,7 @@ for (country in 1:length(country_names)) {
 # predictions are available for (window_months[1] + window_length + s) : window
 data_predictions <- merge(data_fatalities, cbind(bind_rows(predictions), "No_Change" = 0), by = c("country_name", "month_id")) %>% 
   select(., c("country_name", "month_id", starts_with("log_change"), starts_with("OPF_SE"), starts_with("OPF_TADDA1"), "No_Change"))
-write.csv(data_predictions, paste("individual_predictions_w", window_length, ".csv", sep = ""))
+write.csv(data_predictions, paste("Results/individual_predictions_w", window_length, ".csv", sep = ""))
 
 ## 2.1 Summary statistics
 data_OPF_TADDA <- unlist(data_predictions %>% filter(month_id %in% pred_month_id_task2) %>%
@@ -130,7 +130,7 @@ empirical_quantiles <- rbind(round(quantile(data_OPF_SE, (c(1:4, 15:20))/20), 3)
                              round(quantile(data_OPF_TADDA, (c(1:4, 15:20))/20), 3),
                              round(quantile(data_log_change, (c(1:4, 15:20))/20), 3))
 rownames(empirical_quantiles) <- c(OPF_names, "True_log_changes")
-write.csv2(empirical_quantiles, paste("empirical_quantiles_w", window_length, ".csv", sep = ""))
+write.csv2(empirical_quantiles, paste("Results/empirical_quantiles_w", window_length, ".csv", sep = ""))
 
 # the following characteristics are computed across all forecasting horizons s=2,...,7
 mean(data_OPF_SE) # average mean forecast
@@ -148,9 +148,9 @@ sum(abs(data_log_change)>epsilon)/length(data_log_change) # percentage of true l
 ## 2.2
 # compute losses for each prediction horizon and loss function
 loss_all <- compute_losses(data_predictions)
-write.csv(loss_all, paste("individual_losses_w", window_length, ".csv", sep = ""))
+write.csv(loss_all, paste("Results/individual_losses_w", window_length, ".csv", sep = ""))
 
 # summarise losses
 mean_loss_task2_pred <- mean_loss(loss_all, pred_month_id_task2); mean_loss_task2_pred # task 2
 mean_loss_task2_pred_incl_ensembles <- data.frame(mean_loss_task2_pred[,1:2], MSE_ensemble_cm, mean_loss_task2_pred[,3:5], TADDA_ensemble_cm, "MTADDA1_No_Change" = mean_loss_task2_pred[,6])
-write.csv(round(mean_loss_task2_pred_incl_ensembles, 3), paste("average_scores_w", window_length, ".csv", sep = ""))
+write.csv(round(mean_loss_task2_pred_incl_ensembles, 3), paste("Results/average_scores_w", window_length, ".csv", sep = ""))
