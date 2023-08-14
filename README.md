@@ -20,7 +20,7 @@ contains the data for the empirical analysis
 + _data_prep.R_
   * extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa
   * computes true s = 1, ..., 7 step ahead log-changes for each country and month
-  * saves the results in "fatalities.csv"
++ _fatalities.csv_ contains results of _data_prep.R_
 + _ged_cm_postpatch.parquet_ and _skeleton_cm_africa.parquet_ were retrieved from https://github.com/UppsalaConflictDataProgram/views_competition/tree/main/data (published under Creative Commons Attribution-NonCommercial 4.0 International Public License).
 
 **_Results_**
