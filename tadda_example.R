@@ -1,4 +1,4 @@
-### Code for empirical example in Section 5
+### Code for empirical example in SECTION 5
 # This script computes the optimal window size and generates TABLE 2 and TABLE 3
 
 ### Part 0: Initialization
