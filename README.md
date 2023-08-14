@@ -26,7 +26,7 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + _empirical_quantiles_w9.csv_ is the basis of Table 3
 
 **_Figures_**
-+ _example_mali.pdf_ Figure 3
++ Figure 3: _example_mali.pdf_
 
 ### **_Simulation_** – illustrative figures and small simulation examples
 + _functions.R_ contains functions (i) to compute different scoring functions (AE, SE and variants of TADDA), (ii) to numerically determine the optimal point forecast (Bayes act) given a distribution and (iii) to provide text annotations in a plot
