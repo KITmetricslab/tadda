@@ -1,6 +1,11 @@
-### Code for empirical example illustrating properties of forecasts for log changes of armed conflict fatalities using TADDA variants, MAE or MSE
+### Code for empirical example in Section 5
 # Lotta Rüter
 # lotta.rueter@kit.edu
+
+# First, data of fatalities in Africa and relevant functions are imported and parameters initialized
+# Part 1 determines the optimal window length based on averages losses on training set of task 2
+# Part 2 yields results for chosen window length w = 9 for all of Africa
+
 
 # load packages
 library(tidyverse) # includes dplyr, required for "reduce" function
@@ -39,16 +44,16 @@ predictions <- list()
 # mean scores of VIEWS competition ensemble (from Table 2 in Vesco et al., 2022)
 MSE_ensemble_cm <- c(.504, .551, .579, .548, .573, .599, mean(c(.504, .551, .579, .548, .573, .599)))
 TADDA_ensemble_cm <- c(.371, .379, .394, .381, .386, .400, mean(c(.371, .379, .394, .381, .386, .400)))
+# ---------------
 
+
+# ---------------
+### Part 1: Determine optimal window length based on averages losses on training set of task 2
+# ---------------
 loss_means_df_train <- loss_means_df_pred <- data.frame(matrix(NA, ncol = 6, nrow = 17))
 colnames(loss_means_df_train) <- colnames(loss_means_df_pred) <- c("MSE_OPF_SE", "MSE_OPF_TADDA1", "MSE_No_Change",
                                                                    "MTADDA1_OPF_SE", "MTADDA1_OPF_TADDA1", "MTADDA1_No_Change")
-# ---------------
 
-
-# ---------------
-### Part 1: Determine choice of window length based on loss averages on training set of task 2
-# ---------------
 for(window_length in 1:17) { # 17 is highest possible window length, since 409-17-7+1 = 386, the first month for which observations of all countries are available
   print(paste("window_length =", window_length))
   
