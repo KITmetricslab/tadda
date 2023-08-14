@@ -1,4 +1,9 @@
 ### Some functions used to generate illustrations and simulation examples.
+
+# Functions to compute different scores
+# Function to numerically determine the optimal point forecast (bayes act) given a distribution
+# Function for text annotation in a plot
+
 # Johannes Bracher
 # johannes.bracher@kit.edu
 
