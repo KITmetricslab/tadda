@@ -5,7 +5,7 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 ## Notes
 
 + The contents of this repository are under a Creative Commons Attribution-NonCommercial 4.0 International Public License.
-+ Please note that we use the terms optimal point forecast (OPF) and bayes act (BA) synonymously in this code.
++ Please note that we use the terms optimal point forecast (OPF) and Bayes act (BA) synonymously in this code.
 
 ## Contents
 
@@ -19,20 +19,20 @@ contains data and code to reproduce all empirical results
 contains the data for the empirical analysis
 + _data_prep.R_
   * extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa
-  * computes true s=1,...,7 step ahead log-changes for each country and month
+  * computes true s = 1, ..., 7 step ahead log-changes for each country and month
   * saves the results in "fatalities.csv"
 + _ged_cm_postpatch.parquet_ and _skeleton_cm_africa.parquet_ were retrieved from https://github.com/UppsalaConflictDataProgram/views_competition/tree/main/data (published under Creative Commons Attribution-NonCommercial 4.0 International Public License).
 
 **_Results_**
 contains the files associated with the determination of the optimal window size, Table 2 and Table 3
 + _average_scores_for_different_window_lengths.csv_ shows that w=5 would be optimal for minimizing TADDA1 via TADDA1_OPF
-+ _individual_predictions_w9.csv_ and _individual_losses_w9.csv_ contain the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, OPF and lead time s=2,...,7
++ _individual_predictions_w9.csv_ and _individual_losses_w9.csv_ contain the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, OPF and lead time s = 2, ..., 7
 + _average_scores_w9.csv_ contains the central results presented in Table 2
 + _results/empirical_quantiles_w9.csv_ is the basis of Table 3
 
 ### **_Simulation_**
 contains code to reproduce illustrative figures and small simulation examples
-+ _functions.R_ contains functions to compute different scoring functions (AE, SE and variants of TADDA), numerically determine the optimal point forecast (bayes act) given a distribution and to provide text annotation in a plot
++ _functions.R_ contains functions to compute different scoring functions (AE, SE and variants of TADDA), numerically determine the optimal point forecast (Bayes act) given a distribution and to provide text annotation in a plot
 + _illustration.R_ generates Figure 2, Table 1, and supplementary Figure S6
 + _illustrations_proof.R_ generates supplementary Figures S4 and S5
 
