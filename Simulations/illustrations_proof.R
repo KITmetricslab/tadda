@@ -160,7 +160,7 @@ text_in_box(-6, F_minus_epsilon/(2 - F_epsilon),
             expression(F(-epsilon)/(1 + pi["+"])), col = "lightgrey", cex = 0.8)
 text_in_box(-5.5, (1 - F_epsilon + F_minus_epsilon)/(2 - F_epsilon),
             expression((F(-epsilon) + pi["+"])/(1 + pi["+"])), col = "lightgrey", cex = 0.8)
-text_in_box(med_modified + 1.6, 0.15, "BA: median of Z", col = "red")
+text_in_box(med_modified + 1.6, 0.15, "OPF: median of Z", col = "red")
 
 text_in_box(med, 0.95, "median of Y", col = "black")
 
