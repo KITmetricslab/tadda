@@ -102,3 +102,4 @@ legend("bottom", legend = c(paste("Mean:", round(mu, 2)),
                             expression(OPF~TADDA[0.048]: -0.048)),
        cex = 0.75, bty = "n", lty = c(2, 4), col = c("black", "red"))
 dev.off()
+

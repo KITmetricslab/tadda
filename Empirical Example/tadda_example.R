@@ -156,3 +156,4 @@ write.csv(loss_all, paste("Results/individual_losses_w", window_length, ".csv", 
 mean_loss_task2_pred <- mean_loss(loss_all, pred_month_id_task2); mean_loss_task2_pred # task 2
 mean_loss_task2_pred_incl_ensembles <- data.frame(mean_loss_task2_pred[,1:2], MSE_ensemble_cm, mean_loss_task2_pred[,3:5], TADDA_ensemble_cm, "MTADDA1_No_Change" = mean_loss_task2_pred[,6])
 write.csv(round(mean_loss_task2_pred_incl_ensembles, 3), paste("Results/average_scores_w", window_length, ".csv", sep = ""))
+

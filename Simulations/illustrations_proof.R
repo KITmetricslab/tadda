@@ -53,7 +53,7 @@ quantiles_y_epsilon <- quantile(samples_y_epsilon, p = grid_p)
 
 
 # Plot:
-pdf("figures/F_vs_G_epsilon.pdf", width = 6, height = 3.5)
+pdf("Figures/F_vs_G_epsilon.pdf", width = 6, height = 3.5)
 par(las = 1, mar = c(4.2, 4.2, 0.5, 0.5))
 plot(grid_y, F, type = "l", col = "black", xlab = "y", ylab = "cumulative density", ylim = 0:1)
 
@@ -132,7 +132,7 @@ quantiles_y_minus_epsilon <- quantile(samples_y_minus_epsilon, p = grid_p)
 
 # Plot:
 
-pdf("figures/F_vs_G_minus_epsilon.pdf", width = 6, height = 3.5)
+pdf("Figures/F_vs_G_minus_epsilon.pdf", width = 6, height = 3.5)
 par(las = 1, mar = c(4.2, 4.2, 0.5, 0.5))
 plot(grid_y, F, type = "l", col = "black", xlab = "y", ylab = "cumulative density", ylim = 0:1)
 

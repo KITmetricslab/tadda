@@ -84,7 +84,7 @@ for(i in seq_along(grid_y_hat)){
 }
 
 # plot:
-pdf("figures/illustration.pdf", width = 8.5, height = 3)
+pdf("Figures/illustration.pdf", width = 8.5, height = 3)
 # structure plot area:
 layout(matrix(1:2, ncol = 2), widths = c(0.68, 0.32))
 par(mar = c(4.2, 4.2, 0.5, 4.5), las = 1)
@@ -144,7 +144,7 @@ dev.off()
 #####################
 ### additional figure ultimately not used in manuscript: plot expected scores as function of y_hat:
 
-pdf("figures/expected_scores.pdf", width = 7, height = 2.6)
+pdf("Figures/expected_scores.pdf", width = 7, height = 2.6)
 # structure plot area:
 layout(matrix(1:3, nrow = 1), widths = c(2, 2, 1))
 par(las = 1, mar = c(4.2, 4.2, 2.5, 2))
@@ -328,7 +328,7 @@ bayes_acts_L2_v2 <- get_bayes_acts(grid_y = grid_y, grid_epsilon = grid_epsilon,
 
 
 # Plot:
-pdf("figures/ba_epsilon.pdf", width = 7, height = 2.6)
+pdf("Figures/ba_epsilon.pdf", width = 7, height = 2.6)
 
 # tructure plot region:
 layout(matrix(1:3, nrow = 1), widths = c(2, 2, 1))
@@ -393,7 +393,7 @@ dev.off()
 epsilon <- 0.048
 
 ### L1, version TADDA2
-pdf("figures/illustration_TADDA2.pdf", width = 8, height = 4)
+pdf("Figures/illustration_TADDA2.pdf", width = 8, height = 4)
 # structure plot area:
 layout(matrix(c(1, 2, 5,
                 3, 4, 5), byrow = TRUE, ncol = 3), widths = c(2, 2, 1))
