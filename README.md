@@ -26,7 +26,7 @@ contains the data for the empirical analysis
 **_Results_**
 contains the files associated with the determination of the optimal window size, Table 2 and Table 3
 + _average_scores_for_different_window_lengths.csv_ shows that w=5 would be optimal for minimizing TADDA1 via TADDA1_OPF
-+ _individual_predictions_w9.csv_ and _individual_losses_w9.csv_ contain the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, OPF and lead time s = 2, ..., 7
++ _individual_predictions_w9.csv_ and _individual_losses_w9.csv_ contain the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, lead time s = 2, ..., 7 and scoring function / OPF
 + _average_scores_w9.csv_ contains the central results presented in Table 2
 + _empirical_quantiles_w9.csv_ is the basis of Table 3
 
