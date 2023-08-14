@@ -15,9 +15,7 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + _bayes_acts_functions.R_ contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer represenation of the results
 
 **_Data_**
-+ _data_prep.R_
-  * extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa
-  * computes true s = 1, ..., 7 step ahead log-changes for each country and month
++ _data_prep.R_ (i) extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa and (ii) computes true s = 1, ..., 7 step ahead log-changes for each country and month
 + _fatalities.csv_ contains results of _data_prep.R_
 + _ged_cm_postpatch.parquet_ and _skeleton_cm_africa.parquet_ were retrieved from https://github.com/UppsalaConflictDataProgram/views_competition/tree/main/data (published under Creative Commons Attribution-NonCommercial 4.0 International Public License).
 
