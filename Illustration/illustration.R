@@ -1,14 +1,23 @@
 ### Some illustrations and simulation examples on the TADDA scores
+
+# This script generates FIGURE 2, TABLE 1, SUPPLEMENTARY FIGURE S6
+
+# note on nomenclature: this script uses the abbreviation "ba" ("Bayes act") 
+# rather than "opf" ("optimal point forecast")
+
 # Johannes Bracher
 # johannes.bracher@kit.edu
 
-# library for skew normal
-library(sn)
-library(plotrix)
+library(sn) # library for skew normal
+library(plotrix) # library needed for some plotting functionality
+library(xtable) # required for tex tables
 
+
+# set path to current directory (can also be done manually)
 current_path <- rstudioapi::getActiveDocumentContext()$path # get path of this file
 setwd(dirname(current_path))
 
+# get helper functions
 source("functions.R")
 
 # parameters of skew normal:
@@ -19,22 +28,23 @@ alpha <- 8
 # tolerance value:
 epsilon <- 0.048
 
-# generate samples:
+# generate samples from the specified skew normal:
 set.seed(123)
 samples_y <- rsn(100000, xi = xi, omega = omega, alpha = alpha)
 
-
-# compute mean and median:
+# compute mean and median of the skew normal, i.e., OPFs under squared and absolute error:
 (mu <- mean(samples_y))
 (med <- median(samples_y))
-grid_y <- seq(from = 0, to = 0.2, by = 0.001)
+
+# compute TADDA Bayes acts:
+grid_y <- seq(from = 0, to = 0.2, by = 0.001) # requires a grid of values to search
 (ba_tadda1 <- get_bayes_acts(grid_y = grid_y, grid_epsilon = epsilon, samples_y = samples_y, score = TADDA_L1_v1))
 (ba_tadda2 <- get_bayes_acts(grid_y = grid_y, grid_epsilon = epsilon, samples_y = samples_y, score = TADDA_L1_v2))
 
 #####################
-### plot density function:
+### FIGURE 2 from the manuscript:
 
-# grid:
+# grid of values for y (shown on the x-axis of Fig 2):
 grid_y_density <- c(seq(from = -0.5, to = 1.1, by = 0.001))
 
 # evaluate density:
@@ -42,11 +52,12 @@ f <- dsn(x = grid_y_density, xi = xi, omega = omega, alpha = alpha)
 
 
 # compute expected scores as a function of y_hat:
-# more dense where minima occur, less dense for rest
+# grid: more dense where minima occur, less dense for rest
 grid_y_hat <- c(seq(from = -0.5, to = 0, by = 0.01),
                 seq(from = 0.001, to = 0.3, by = 0.001),
                 seq(from = 0.31, to = 1.1, by = 0.01))
 
+#empty vectors to store expected scores:
 average_scores_ae <-
   average_scores_se <-
   average_scores_tadda_l1_0 <-
@@ -57,6 +68,7 @@ average_scores_ae <-
   average_scores_tadda_l2_v2_epsilon <-
   numeric(length(grid_y_hat))
 
+# fill these vectors:
 for(i in seq_along(grid_y_hat)){
   y_hat_temp <- grid_y_hat[i]
   average_scores_ae[i] <- mean(abs(y_hat_temp - samples_y))
@@ -71,16 +83,25 @@ for(i in seq_along(grid_y_hat)){
   average_scores_tadda_l2_v2_epsilon[i] <- mean(TADDA_L2_v2(y_hat_temp, samples_y, epsilon = epsilon))
 }
 
+# plot:
 pdf("figures/illustration.pdf", width = 8.5, height = 3)
+# structure plot area:
 layout(matrix(1:2, ncol = 2), widths = c(0.68, 0.32))
 par(mar = c(4.2, 4.2, 0.5, 4.5), las = 1)
+
+# plot density:
 plot(grid_y_density, f, type = "l", ylab = "f(y)", xlab = "", ylim = c(0, 2))
+
+# custom x-axis labelling:
 mtext(expression(y), side = 1, line = 2.5, at = 0.2)
 mtext(expression(hat(y)), side = 1, line = 2.5, at = 0.3, col = "darkgrey")
+
+# add second axis (right):
 axis(4, at = 0:4/2, labels = paste0(0:4, ".0"), col.axis = "darkgrey", col.ticks = "darkgrey")
 par(las = 0)
 mtext(side = 4, at = 1, line = 3, "expected score", col = "darkgrey")
 par(las = 1)
+# # show tolerance region (commented out as plot gets busy)
 # rect(-epsilon, 0, epsilon, c(-1, 2.5), col = "grey97", border = NA)
 # abline(v = epsilon, lty = 3, col = "grey")
 # abline(v = -epsilon, lty = 3, col = "grey")
@@ -92,15 +113,15 @@ lines(grid_y_hat, 2*average_scores_tadda_l1_v1_epsilon, type = "l", col = rgb(1,
 lines(grid_y_hat, 2*average_scores_ae, type = "l", col = "darkgrey", lty = "dotted")
 lines(grid_y_hat, 2*average_scores_se, type = "l", col = "darkgrey", lty = "dashed")
 
-
+# add density on top:
 lines(grid_y_density, f)
 
-
-
+# vertical lines indicating OPFs:
 abline(v = mu, lty = 2, col = "black")
 abline(v = med, lty = 3, col = "black")
 abline(v = ba_tadda1, lty = 4, col = "red")
 
+# extra panel for legend:
 par(mar = c(0, 0, 0, 0), las = 1)
 plot(NULL, xlim = 0:1, ylim = 0:1, axes = FALSE, xlab = "", ylab = "")
 legend("center", legend = c("Functionals of F:",
@@ -121,9 +142,10 @@ dev.off()
 
 
 #####################
-### plot expected scores as function of y_hat:
+### additional figure ultimately not used in manuscript: plot expected scores as function of y_hat:
 
 pdf("figures/expected_scores.pdf", width = 7, height = 2.6)
+# structure plot area:
 layout(matrix(1:3, nrow = 1), widths = c(2, 2, 1))
 par(las = 1, mar = c(4.2, 4.2, 2.5, 2))
 yl <- c(0.1, 0.4)
@@ -134,14 +156,8 @@ plot(grid_y_hat, average_scores_tadda_l1_0, type = "l", col = "black", xlab = ex
      ylab = "expected score", xlim = c(-0.1, 0.2), ylim = yl)
 mtext("(a) L1", side = 3, line = 0.5)
 
-
+# highlight tolerance area:
 rect(-epsilon, 0, epsilon, 1.2*yl[2], col = "grey97", border = NA)
-
-abline(v = med, col = "darkgrey")
-text_in_box(med, 0.36, "m", col = "darkgrey")
-
-# abline(v = mu,  col = "darkgrey")
-# text_in_box(mu, 0.36, expression(mu), col = "darkgrey")
 
 abline(v = 0, col = "darkgrey", lty = "dotted")
 text_in_box(0, 0.9*yl[2], 0, col = "darkgrey")
@@ -152,11 +168,17 @@ text_in_box(epsilon, 0.9*yl[2], expression(epsilon), col = "darkgrey")
 abline(v = -epsilon,  col = "darkgrey", lty = "dotted")
 text_in_box(-epsilon, 0.9*yl[2], expression(-epsilon), col = "darkgrey")
 
+# highlight median:
+abline(v = med, col = "darkgrey")
+text_in_box(med, 0.36, "m", col = "darkgrey")
+
+# add curves:
 lines(grid_y_hat, average_scores_tadda_l1_0, type = "l", col = "black", lty = "solid")
 lines(grid_y_hat, average_scores_tadda_l1_v1_epsilon, type = "l", col = "red", lty = "dashed")
 lines(grid_y_hat, average_scores_tadda_l1_v2_epsilon, type = "l", col = "blue", lty = "twodash")
 lines(grid_y_hat, average_scores_ae, type = "l", col = "darkgreen", lty = "dotted")
 
+# add points for minima:
 points(grid_y_hat[which.min(average_scores_tadda_l1_0)], min(average_scores_tadda_l1_0),
        col = "black", pch = 18, cex = cex.pt)
 points(grid_y_hat[which.min(average_scores_tadda_l1_v1_epsilon)], min(average_scores_tadda_l1_v1_epsilon),
@@ -174,13 +196,8 @@ plot(grid_y_hat, average_scores_tadda_l2_0, type = "l", col = "black", xlab = ex
      ylab = "expected score", xlim = c(-0.1, 0.2), ylim = yl2)
 mtext("(b) L2", side = 3, line = 0.5)
 
+# highlight tolerance area:
 rect(-epsilon, 0, epsilon, 1.2*yl2[2], col = "grey97", border = NA)
-
-# abline(v = med, col = "darkgrey")
-# text_in_box(med, 0.8*yl2[2], "m", col = "darkgrey")
-
-abline(v = mu,  col = "darkgrey")
-text_in_box(mu, 0.9*yl2[2], expression(mu), col = "darkgrey")
 
 abline(v = 0, col = "darkgrey", lty = "dotted")
 text_in_box(0, 0.9*yl2[2], 0, col = "darkgrey")
@@ -191,11 +208,17 @@ text_in_box(epsilon, 0.9*yl2[2], expression(epsilon), col = "darkgrey")
 abline(v = -epsilon,  col = "darkgrey", lty = "dotted")
 text_in_box(-epsilon, 0.9*yl2[2], expression(-epsilon), col = "darkgrey")
 
+# highligh mu:
+abline(v = mu,  col = "darkgrey")
+text_in_box(mu, 0.9*yl2[2], expression(mu), col = "darkgrey")
+
+# add curves:
 lines(grid_y_hat, average_scores_tadda_l2_0, type = "l", col = "black", lty = "solid")
 lines(grid_y_hat, average_scores_tadda_l2_v1_epsilon, type = "l", col = "red", lty = "dashed")
 lines(grid_y_hat, average_scores_tadda_l2_v2_epsilon, type = "l", col = "blue", lty = "twodash")
 lines(grid_y_hat, average_scores_se, type = "l", col = "purple", lty = "dotted")
 
+# add points for minima:
 points(grid_y_hat[which.min(average_scores_tadda_l2_0)], min(average_scores_tadda_l2_0),
        col = "black", pch = 18, cex = cex.pt)
 points(grid_y_hat[which.min(average_scores_tadda_l2_v1_epsilon)], min(average_scores_tadda_l2_v1_epsilon),
@@ -207,7 +230,7 @@ points(grid_y_hat[which.min(average_scores_se)], min(average_scores_se),
 
 box()
 
-# Legend
+# Legend in separate panel:
 par(mar = c(0, 0, 0, 0))
 plot(NULL, xlim = 0:1, ylim = 0:1, xlab = "", ylab = "", axes = FALSE)
 legend("center", legend = c(expression(AE(hat(y), y)),
@@ -223,7 +246,9 @@ dev.off()
 
 
 #####################
-### Table with expected scores of Bayes acts:
+### TABLE 1: Table with expected scores of Bayes acts:
+
+# matrix tro store expected scores:
 expected_scores <- matrix(ncol = 9, nrow = 9)
 colnames(expected_scores) <- c("value", "AE", "SE", 
                                "TADDA_L1_0", "TADDA_L1_v1", "TADDA_L1_v2",
@@ -233,12 +258,13 @@ rownames(expected_scores) <- c("median", "mean",
                                "BA TADDA_L2_0", "BA TADDA_L2_v1", "BA TADDA_L2_v2",
                                "zero")
 
+# extract OPFs from previously cimputed vectors:
 ba_tadda_l1_v1_epsilon <- grid_y_hat[which.min(average_scores_tadda_l1_v1_epsilon)]
 ba_tadda_l1_v2_epsilon <- grid_y_hat[which.min(average_scores_tadda_l1_v2_epsilon)]
 ba_tadda_l2_v1_epsilon <- grid_y_hat[which.min(average_scores_tadda_l2_v1_epsilon)]
 ba_tadda_l2_v2_epsilon <- grid_y_hat[which.min(average_scores_tadda_l2_v2_epsilon)]
 
-
+# add OPFs to matrix:
 expected_scores[, "value"] <- c(med, mu, 
                                 ba_tadda1, ba_tadda_l1_v1_epsilon, ba_tadda_l1_v2_epsilon,
                                 ba_tadda2, ba_tadda_l2_v1_epsilon, ba_tadda_l2_v2_epsilon,
@@ -249,6 +275,7 @@ expected_scores[, "AE"] <- sapply(expected_scores[, "value"],
 expected_scores[, "SE"] <- sapply(expected_scores[, "value"], 
                                   function(y_hat) mean((y_hat - samples_y)^2))
 
+# add expected scores to matrix:
 expected_scores[, "TADDA_L1_0"] <- sapply(expected_scores[, "value"], 
                                           function(x) mean(TADDA_L1(x, y = samples_y)))
 expected_scores[, "TADDA_L1_v1"] <- sapply(expected_scores[, "value"],
@@ -263,19 +290,21 @@ expected_scores[, "TADDA_L2_v1"] <- sapply(expected_scores[, "value"],
 expected_scores[, "TADDA_L2_v2"] <- sapply(expected_scores[, "value"],
                                            function(x) mean(TADDA_L2_v2(x, y = samples_y, epsilon = epsilon)))
 
+# use only a subset of the generated matrix for the manuscript:
 expected_scores_small <- rbind(expected_scores[c("median", "mean", "BA TADDA_L1_v1", "BA TADDA_L1_v2"), ],
                                zero = expected_scores["zero", ])
 expected_scores_small <- expected_scores_small[, c("AE", "SE", "TADDA_L1_v1", "TADDA_L1_v2")]
 
-library(xtable)
-# scores:
+# generate latex code: expected scores
 xtable(expected_scores_small, 3, digits = 3)
 
-# Bayes acts:
+# OPFs:
 xtable(matrix(expected_scores[1:8, "value"], nrow = 1), digits = 3)
 
+
+
 #########################
-### plotting Bayes act as a function of epsilon:
+### additional figure ultimately not used in manuscript: plotting Bayes act as a function of epsilon:
 
 # grif of y-values to check for Bayes act:
 grid_y <- seq(from = 0.01, to = 0.3, by = 0.002)
@@ -358,12 +387,14 @@ dev.off()
 
 
 #################
-# Illustration of TADDA scores:
+# SUPPLEMENTARY FIGURE S6: Illustration of TADDA2 score:
 
+# set epsilon
 epsilon <- 0.048
 
 ### L1, version TADDA2
 pdf("figures/illustration_TADDA2.pdf", width = 8, height = 4)
+# structure plot area:
 layout(matrix(c(1, 2, 5,
                 3, 4, 5), byrow = TRUE, ncol = 3), widths = c(2, 2, 1))
 par(mar = c(4.2, 4, 3, 0.5), las = 1)
@@ -501,6 +532,7 @@ text_in_box(epsilon, 0.9*ylim[2], expression(epsilon), col = "darkgrey")
 text_in_box(-epsilon,  0.9*ylim[2], expression(-epsilon), col = "darkgrey")
 text_in_box(y_true,  0.5*ylim[2], expression(hat(y)), col = "darkgrey")
 
+# legend in separate panel:
 par(mar = c(0, 0, 0, 0))
 plot(NULL, xlim = 0:1, ylim = 0:1, xlab = "", ylab = "", axes = FALSE)
 legend("center", legend = c(# expression({TADDA[0]}(hat(y), y)),
@@ -512,7 +544,7 @@ dev.off()
 
 
 
-### L2
+### additional figure ultimately not used: illustration of L2 scores
 
 pdf("figures/curves_scores_L2.pdf", width = 8, height = 4)
 layout(matrix(c(1, 2, 5,
@@ -649,86 +681,3 @@ legend("center", legend = c(expression({TADDA[0]^(2)}(hat(y), y)),
        bty = "n", cex = 1.2, lty = c("solid", "dashed", "twodash"), col = c("black", "red", "blue"),
        y.intersp = 1.5)
 dev.off()
-
-
-#####################
-# Illustration of Fabian's score
-
-
-x <- seq(from = -1, to = 1, by = 0.001)
-d <- 0.05
-yl <- c(0, 4)
-pi <- 0.2
-epsilon <- 0.048
-shift <- 0.05
-
-new_score <- function(x, y, d, pi){
-  (x - y)^2 + pi*(log((1 + exp(y/d))/(1 + exp(x/d))) - (y - x)/(1 + exp(-x/d))/d)
-}
-
-pdf(paste0("figures/new_score_", d, ".pdf"), width = 7, height = 2.7)
-layout(matrix(c(1, 2, 3, 4, 4, 4), nrow = 2, byrow = TRUE), heights = c(0.85, 0.15))
-par(mar = c(4, 4.4, 1, 1))
-y <- 0
-sc <- new_score(x, y, d, pi)
-se <- (x - y)^2
-TA2 <- TADDA_L2_v1(x, y, epsilon = epsilon)
-
-plot(x, sc + shift, type = "l", xlab = expression(hat(y)), ylab = expression(s(hat(y), y)), ylim = yl,
-     col = "orange", lty = 6)
-lines(x, se - shift, col = "black", lty = 3)
-lines(x, TA2, col = "blue", lty = 4)
-abline(v = y, col = "darkgrey")
-text_in_box(y, 3, "y", col = "darkgrey")
-text_in_box(0, 2, "0", col = "darkgrey")
-
-
-y <- 0.2
-sc <- new_score(x, y, d, pi)
-se <- (x - y)^2
-TA2 <- TADDA_L2_v1(x, y, epsilon = epsilon)
-
-plot(x, sc + shift, type = "l", xlab = expression(hat(y)), ylab = expression(s(hat(y), y)), ylim = yl,
-     col = "orange", lty = 6)
-lines(x, se - shift, col = "black", lty = 3)
-lines(x, TA2, col = "blue", lty = 4)
-abline(v = y, col = "darkgrey")
-text_in_box(y, 3, "y", col = "darkgrey")
-
-abline(v = 0, col = "darkgrey", lty = 3)
-text_in_box(0, 2, "0", col = "darkgrey")
-
-
-y <- 0.8
-sc <- new_score(x, y, d, pi)
-se <- (x - y)^2
-TA2 <- TADDA_L2_v1(x, y, epsilon = epsilon)
-
-plot(x, sc + shift, type = "l", xlab = expression(hat(y)), ylab = expression(s(hat(y), y)), ylim = yl,
-     col = "orange", lty = 6)
-lines(x, se - shift, col = "black", lty = 3)
-lines(x, TA2, col = "blue", lty = 4)
-abline(v = y, col = "darkgrey")
-text_in_box(y, 3, "y", col = "darkgrey")
-
-abline(v = 0, col = "darkgrey", lty = 3)
-text_in_box(0, 2, "0", col = "darkgrey")
-
-par(mar = c(0, 0, 0, 0))
-plot(NULL, xlab = "", ylab = "", axes = FALSE, xlim = 0:1, ylim = 0:1)
-legend("center", legend = c("suggested score", expression(TADDA[0.048]~with~L2~distance), "SE"),
-       col = c("orange", "blue", "black"), lty = c(6, 4, 3), ncol = 3, bty = "n")
-
-dev.off()
-
-# test new score:
-samples_y <- rsn(100000, xi = xi, omega = omega, alpha = alpha)
-mu <- mean(samples_y)
-
-new_sc <- numeric(length(x))
-for(i in seq_along(x)){
-  new_sc[i] <- mean(new_score(x = x[i], y = samples_y, d = 0.1, pi = 1))
-}
-plot(x, new_sc, type = "l")
-abline(v = mu)
-x[which.min(new_sc)]
