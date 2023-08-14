@@ -14,14 +14,14 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + _example_mali.R_ generates Figure 3
 + _bayes_acts_functions.R_ contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer represenation of the results
 
-**_Data_** – data for the empirical analysis
+**_Data_**
 + _data_prep.R_
   * extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa
   * computes true s = 1, ..., 7 step ahead log-changes for each country and month
 + _fatalities.csv_ contains results of _data_prep.R_
 + _ged_cm_postpatch.parquet_ and _skeleton_cm_africa.parquet_ were retrieved from https://github.com/UppsalaConflictDataProgram/views_competition/tree/main/data (published under Creative Commons Attribution-NonCommercial 4.0 International Public License).
 
-**_Results_** – results of the empirical analysis
+**_Results_**
 + _average_scores_for_different_window_lengths.csv_ shows that w = 5 would be optimal for minimizing TADDA1 via TADDA1_OPF
 + _individual_predictions_w9.csv_ and _individual_losses_w9.csv_ contain the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, lead time s = 2, ..., 7 and scoring function / OPF
 + _average_scores_w9.csv_ contains the central results presented in Table 2
