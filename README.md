@@ -2,8 +2,12 @@
 
 by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie Schienle published in _International Interactions_ (forthcoming)
 
-## Contents
+## Notes
+
+The contents of this repository are under a Creative Commons Attribution-NonCommercial 4.0 International Public License.
 Please note that we use the terms optimal point forecast (OPF) and bayes act (BA) synonymously in this code.
+
+## Contents
 
 ### **_Empirical Example_**
 contains data and code to reproduce all empirical results
