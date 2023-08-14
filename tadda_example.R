@@ -1,4 +1,6 @@
 ### Code for empirical example in Section 5
+# This script computes the optimal window size and generates TABLE 2 and TABLE 3
+
 # Lotta Rüter
 # lotta.rueter@kit.edu
 
@@ -7,8 +9,8 @@
 
 ### Part 2: Yields results for chosen window length w = 9 for all of Africa
 # Computes the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, OPF and lead time s=2,...,7, see "results/individual_predictions_w9.csv" and "results/individual_losses_w9.csv"
-# Produces the central results presented in Table 2, see "results/average_scores_w9.csv"
-# Produces the basis of Table 3, see "results/empirical_quantiles_w9.csv"
+# Produces the central results presented in TABLE 2, see "results/average_scores_w9.csv"
+# Produces the basis of TABLE 3, see "results/empirical_quantiles_w9.csv"
 
 # ---------------
 ### Part 0: Initialization
