@@ -3,6 +3,8 @@
 by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie Schienle published in _International Interactions_ (forthcoming).
 
 ## Contents
+Note that we use the terms optimal point forecast (OPF) and bayes act (BA) synonymously in this code.
+
 ### **Empirical Example**
 contains data and code to reproduce all empirical results
 + The file _bayes_acts_functions.R_ contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer represenation of the results
