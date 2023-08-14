@@ -7,11 +7,12 @@ Please note that we use the terms optimal point forecast (OPF) and bayes act (BA
 
 ### **Empirical Example**
 contains data and code to reproduce all empirical results
-+ The file _bayes_acts_functions.R_ contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer represenation of the results
-+ The file _example_mali.R_ generates Figure 3
 + The file _tadda_example.R_ contains the code for empirical example in Section 5: it computes the optimal window size and generates Table 2 and Table 3
++ The file _example_mali.R_ generates Figure 3
++ The file _bayes_acts_functions.R_ contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer represenation of the results
 
 **Data**
+contains the data for the empirical analysis
 + The file _data_prep.R_
   * extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa
   * computes true s=1,...,7 step ahead log-changes for each country and month
@@ -19,7 +20,11 @@ contains data and code to reproduce all empirical results
 + The files _ged_cm_postpatch.parquet_ and _skeleton_cm_africa.parquet_ were retrieved from https://github.com/UppsalaConflictDataProgram/views_competition/tree/main/data (published under Creative Commons Attribution-NonCommercial 4.0 International Public License).
 
 **Results**
-
+contains the files associated with the determination of the optimal window size as well as Table 2 and 3
++ The file _average_scores_for_different_window_lengths.csv_ shows that w=5 would be optimal for minimizing TADDA1 via TADDA1_OPF
++ The files _individual_predictions_w9.csv_ and _individual_losses_w9.csv_ contain the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, OPF and lead time s=2,...,7
++ The file _average_scores_w9.csv_ contains the central results presented in Table 2
++ The file _results/empirical_quantiles_w9.csv_ is the basis of Table 3
 
 ### **Simulation**
 contains code to reproduce illustrative figures and small simulation examples
