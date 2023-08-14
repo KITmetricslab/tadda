@@ -1,6 +1,8 @@
 ### Code for empirical example in Section 5
 # This script computes the optimal window size and generates TABLE 2 and TABLE 3
 
+### Part 0: Initialization
+
 ### Part 1: Determines optimal window length based on averages losses on training set of task 2
 # Produces "results/average_scores_for_different_window_lengths.csv" which shows that w=5 would be optimal for minimizing TADDA1 via TADDA1_OPF
 
