@@ -35,41 +35,18 @@ grid_y <- seq(from = 0, to = 0.2, by = 0.001)
 ### plot density function:
 
 # grid:
-grid_y_density <- seq(from = -0.4, to = 1.2, by = 0.001)
+grid_y_density <- c(seq(from = -0.5, to = 1.1, by = 0.001))
 
 # evaluate density:
 f <- dsn(x = grid_y_density, xi = xi, omega = omega, alpha = alpha)
 
 
-pdf("figures/illustration.pdf", width = 6, height = 3)
-par(mar = c(4.2, 4.2, 0.5, 0.5), las = 1)
-plot(grid_y_density, f, type = "l", ylab = "f(y)", xlab = "y", ylim = c(0, 2))
-# rect(-epsilon, 0, epsilon, c(-1, 2.5), col = "grey97", border = NA)
-# abline(v = epsilon, lty = 3, col = "grey")
-# abline(v = -epsilon, lty = 3, col = "grey")
+# compute expected scores as a function of y_hat:
+# more dense where minima occur, less dense for rest
+grid_y_hat <- c(seq(from = -0.5, to = 0, by = 0.01),
+                seq(from = 0.001, to = 0.3, by = 0.001),
+                seq(from = 0.31, to = 1.1, by = 0.01))
 
-box()
-lines(grid_y_density, f)
-
-abline(v = mu, lty = 2, col = "black")
-abline(v = med, lty = 3, col = "black")
-abline(v = ba_tadda1, lty = 4, col = "red")
-
-legend("topright", legend = c(paste0("Mean: ", round(mu, 3)), # hard-coded, modify as needed
-                              paste0("Median: ", round(med, 3)),
-                              expression(OPF~TADDA[0.048]: 0.06)),
-                              # expression(BA~under~TADDA[0]: 0.019)),
-       lty = c(2, 3, 4, 5), bty = "n", col = c("black", "black", "red"), cex = 0.9)
-dev.off()
-
-
-
-#####################
-### plot expected scores as function of y_hat:
-
-epsilon <- 0.048
-
-grid_y_hat <- seq(from = -0.1, to = 0.2, by = 0.001)
 average_scores_ae <-
   average_scores_se <-
   average_scores_tadda_l1_0 <-
@@ -93,6 +70,58 @@ for(i in seq_along(grid_y_hat)){
   average_scores_tadda_l2_v1_epsilon[i] <- mean(TADDA_L2_v1(y_hat_temp, samples_y, epsilon = epsilon))
   average_scores_tadda_l2_v2_epsilon[i] <- mean(TADDA_L2_v2(y_hat_temp, samples_y, epsilon = epsilon))
 }
+
+pdf("figures/illustration.pdf", width = 8.5, height = 3)
+layout(matrix(1:2, ncol = 2), widths = c(0.68, 0.32))
+par(mar = c(4.2, 4.2, 0.5, 4.5), las = 1)
+plot(grid_y_density, f, type = "l", ylab = "f(y)", xlab = "", ylim = c(0, 2))
+mtext(expression(y), side = 1, line = 2.5, at = 0.2)
+mtext(expression(hat(y)), side = 1, line = 2.5, at = 0.3, col = "darkgrey")
+axis(4, at = 0:4/2, labels = paste0(0:4, ".0"), col.axis = "darkgrey", col.ticks = "darkgrey")
+par(las = 0)
+mtext(side = 4, at = 1, line = 3, "expected score", col = "darkgrey")
+par(las = 1)
+# rect(-epsilon, 0, epsilon, c(-1, 2.5), col = "grey97", border = NA)
+# abline(v = epsilon, lty = 3, col = "grey")
+# abline(v = -epsilon, lty = 3, col = "grey")
+
+box()
+
+# light lines with expected scores:
+lines(grid_y_hat, 2*average_scores_tadda_l1_v1_epsilon, type = "l", col = rgb(1, 0, 0, 0.25), lty = 4)
+lines(grid_y_hat, 2*average_scores_ae, type = "l", col = "darkgrey", lty = "dotted")
+lines(grid_y_hat, 2*average_scores_se, type = "l", col = "darkgrey", lty = "dashed")
+
+
+lines(grid_y_density, f)
+
+
+
+abline(v = mu, lty = 2, col = "black")
+abline(v = med, lty = 3, col = "black")
+abline(v = ba_tadda1, lty = 4, col = "red")
+
+par(mar = c(0, 0, 0, 0), las = 1)
+plot(NULL, xlim = 0:1, ylim = 0:1, axes = FALSE, xlab = "", ylab = "")
+legend("center", legend = c("Functionals of F:",
+                            paste0("Mean: ", round(mu, 3)), # hard-coded, modify as needed
+                              paste0("Median: ", round(med, 3)),
+                              expression(OPF~TADDA[0.048]: 0.06),
+                              "",
+                              expression(Expected~score~ of~hat(y)~under~"F:"),
+                              "SE",
+                              "AE",
+                              expression(TADDA[0.048])),
+                              # expression(BA~under~TADDA[0]: 0.019)),
+       lty = c(NA, 2, 3, 4, NA, NA, 2, 3, 4), # bty = "n",
+       col = c(NA, "black", "black", "red", NA,
+               NA, "darkgrey", "darkgrey", rgb(1, 0, 0, 0.25)), cex = 0.9, bty = "n")
+dev.off()
+
+
+
+#####################
+### plot expected scores as function of y_hat:
 
 pdf("figures/expected_scores.pdf", width = 7, height = 2.6)
 layout(matrix(1:3, nrow = 1), widths = c(2, 2, 1))
@@ -234,9 +263,9 @@ expected_scores[, "TADDA_L2_v1"] <- sapply(expected_scores[, "value"],
 expected_scores[, "TADDA_L2_v2"] <- sapply(expected_scores[, "value"],
                                            function(x) mean(TADDA_L2_v2(x, y = samples_y, epsilon = epsilon)))
 
-expected_scores_small <- rbind(expected_scores[c("median", "mean", "BA TADDA_L1_v1"), ],
+expected_scores_small <- rbind(expected_scores[c("median", "mean", "BA TADDA_L1_v1", "BA TADDA_L1_v2"), ],
                                zero = expected_scores["zero", ])
-expected_scores_small <- expected_scores_small[, c("AE", "SE", "TADDA_L1_v1")]
+expected_scores_small <- expected_scores_small[, c("AE", "SE", "TADDA_L1_v1", "TADDA_L1_v2")]
 
 library(xtable)
 # scores:
@@ -333,8 +362,8 @@ dev.off()
 
 epsilon <- 0.048
 
-### L1
-pdf("figures/curves_scores_L1.pdf", width = 8, height = 4)
+### L1, version TADDA2
+pdf("figures/illustration_TADDA2.pdf", width = 8, height = 4)
 layout(matrix(c(1, 2, 5,
                 3, 4, 5), byrow = TRUE, ncol = 3), widths = c(2, 2, 1))
 par(mar = c(4.2, 4, 3, 0.5), las = 1)
@@ -356,7 +385,7 @@ grid_ae_a <- abs(grid_y - y_true)
 plot(grid_y, grid_TADDA_v1_a, xlab = expression(hat(y)),
      ylab = ylab, ylim = ylim, xlim = xlim, col = "white")
 mtext(expression(
-  TADDA~with~y%in%paste("(", -epsilon, ",", epsilon, ")"~", varying"~hat(y))
+  TADDA~with~y%in%paste("[", -epsilon, ",", epsilon, "]"~", varying"~hat(y))
 ), 3, cex = 0.9, line = 0.3)
 
 rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
@@ -364,7 +393,7 @@ abline(h = 0:10, col = "grey95")
 abline(v = -6:8, col = "grey95")
 box()
 # lines(grid_y, grid_TADDA_a + shift, col = "red", lty = 5)
-lines(grid_y, grid_TADDA_v1_a, col = "red", lty = 4)
+lines(grid_y, grid_TADDA_v2_a, col = "red", lty = 4)
 lines(grid_y, grid_ae_a - shift, col = "black", lty = 3)
 # lines(grid_y, grid_TADDA_v2_a + shift, col = "blue", lty = "twodash")
 
@@ -394,7 +423,7 @@ abline(h = 0:10, col = "grey95")
 abline(v = -6:8, col = "grey95")
 box()
 # lines(grid_y, grid_TADDA_b + shift, col = "red", lty = 5)
-lines(grid_y, grid_TADDA_v1_b, col = "red", lty = 4)
+lines(grid_y, grid_TADDA_v2_b, col = "red", lty = 4)
 lines(grid_y, grid_ae_b - shift, col = "black", lty = 3)
 
 # lines(grid_y, grid_TADDA_v2_b + shift, col = "blue", lty = "twodash")
@@ -415,13 +444,13 @@ text_in_box(y_true,  0.5*ylim[2], expression(y), col = "darkgrey")
 y_hat <- 0.03
 grid_TADDA_c <- TADDA_L1(y_hat, grid_y)
 grid_TADDA_v1_c <- TADDA_L1_v1(y_hat, grid_y, epsilon = epsilon)
-# grid_TADDA_v2_c <- TADDA_L1_v2(y_hat, grid_y, epsilon = epsilon)
+grid_TADDA_v2_c <- TADDA_L1_v2(y_hat, grid_y, epsilon = epsilon)
 grid_ae_c <- abs(y_hat - grid_y)
 
 plot(grid_y, grid_TADDA_v1_c + shift, type = "l", xlab = expression(y),
      ylab = ylab, ylim = ylim, xlim = xlim, col = "white")
 mtext(
-  expression(TADDA~with~hat(y)%in%paste("(", -epsilon, ",", epsilon, ")"~", varying"~y)),
+  expression(TADDA~with~hat(y)%in%paste("[", -epsilon, ",", epsilon, "]"~", varying"~y)),
   3, cex = 0.9, line = 0.3)
 
 rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
@@ -429,7 +458,7 @@ abline(h = 0:10, col = "grey95")
 abline(v = -6:8, col = "grey95")
 box()
 # lines(grid_y, grid_TADDA_c + shift, col = "red", lty = 5)
-lines(grid_y, grid_TADDA_v1_c, col = "red", lty = 4)
+lines(grid_y, grid_TADDA_v2_c, col = "red", lty = 4)
 lines(grid_y, grid_ae_c - shift, col = "black", lty = 3)
 
 # lines(grid_y, grid_TADDA_v2_c - shift, col = "blue", lty = "twodash")
@@ -460,7 +489,7 @@ abline(h = 0:10, col = "grey95")
 abline(v = -6:8, col = "grey95")
 box()
 # lines(grid_y, grid_TADDA_d + shift, col = "red", lty = 5)
-lines(grid_y, grid_TADDA_v1_d, col = "red", lty = 4)
+lines(grid_y, grid_TADDA_v2_d, col = "red", lty = 4)
 lines(grid_y, grid_ae_d - shift, col = "black", lty = 3)
 
 abline(v = 0, col = "darkgrey", lty = "dotted")
@@ -475,7 +504,7 @@ text_in_box(y_true,  0.5*ylim[2], expression(hat(y)), col = "darkgrey")
 par(mar = c(0, 0, 0, 0))
 plot(NULL, xlim = 0:1, ylim = 0:1, xlab = "", ylab = "", axes = FALSE)
 legend("center", legend = c(# expression({TADDA[0]}(hat(y), y)),
-                            expression({TADDA[epsilon]}(hat(y), y)),
+                            expression({TADDA2[epsilon]}(hat(y), y)),
                             expression(AE(hat(y), y))),
        bty = "n", cex = 1.2, lty = 5:3, col = c("red", "black"),
        y.intersp = 1.5)
@@ -505,7 +534,7 @@ grid_TADDA_L2_v2_a <- TADDA_L2_v2(grid_y, y_true, epsilon = epsilon)
 plot(grid_y, grid_TADDA_L2_a, type = "l", xlab = expression(hat(y)),
      ylab = ylab, ylim = ylim, xlim = xlim)
 mtext(expression(
-  TADDA^(2)~with~y%in%paste("(", -epsilon, ",", epsilon, ")"~", varying"~hat(y))
+  TADDA^(2)~with~y%in%paste("[", -epsilon, ",", epsilon, "]"~", varying"~hat(y))
 ), 3, cex = 0.9, line = 0.3)
 
 rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
@@ -565,7 +594,7 @@ grid_TADDA_L2_v2_c <- TADDA_L2_v2(y_hat, grid_y, epsilon = epsilon)
 plot(grid_y, grid_TADDA_L2_c, type = "l", xlab = expression(y),
      ylab = ylab, ylim = ylim, xlim = xlim)
 mtext(
-  expression(TADDA^(2)~with~hat(y)%in%paste("(", -epsilon, ",", epsilon, ")"~", varying"~y)),
+  expression(TADDA^(2)~with~hat(y)%in%paste("[", -epsilon, ",", epsilon, "]"~", varying"~y)),
   3, cex = 0.9, line = 0.3)
 
 rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
