@@ -1,7 +1,6 @@
-### Functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA)
-
-# Functions for computing the OPFs of different loss functions
-# Summary functions for nicer representation of results
+### Functions for computing the optimal point forecasts (OPFs)
+# of different scoring functions (AE, SE and variants of TADDA)
+# as well as a summary function for a nicer represenation of the results
 
 # Lotta Rüter
 # lotta.rueter@kit.edu
