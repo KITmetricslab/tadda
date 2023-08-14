@@ -14,18 +14,18 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + _example_mali.R_ generates Figure 3
 + _bayes_acts_functions.R_ contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer represenation of the results
 
-**_Empirical Example/Data_**
+**_/Data_**
 + _data_prep.R_ (i) extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa and (ii) computes true s = 1, ..., 7 step ahead log-changes for each country and month
 + _fatalities.csv_ contains results of _data_prep.R_
 + _ged_cm_postpatch.parquet_ and _skeleton_cm_africa.parquet_ were retrieved from https://github.com/UppsalaConflictDataProgram/views_competition/tree/main/data (published under Creative Commons Attribution-NonCommercial 4.0 International Public License).
 
-**_Empirical Example/Results_**
+**_/Results_**
 + _average_scores_for_different_window_lengths.csv_ shows that w = 5 would be optimal for minimizing TADDA1 via TADDA1_OPF
 + _individual_predictions_w9.csv_ and _individual_losses_w9.csv_ contain the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, lead time s = 2, ..., 7 and scoring function / OPF
 + _average_scores_w9.csv_ contains the central results presented in Table 2
 + _empirical_quantiles_w9.csv_ is the basis of Table 3
 
-**_Figures_**
+**_/Figures_**
 + Figure 3: _example_mali.pdf_
 
 ### **_Simulations_** – illustrative figures and small simulation examples
@@ -33,7 +33,7 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + _illustration.R_ generates Figure 2, Table 1, and Supplementary Figure S6
 + _illustrations_proof.R_ generates Supplementary Figures S4 and S5
 
-**_Simulations/Figures_**
+**_/Figures_**
 + Figure 2: _illustration.pdf_
 + Figure S4: _F_vs_G_epsilon.pdf_
 + Figure S5: _F_vs_G_minus_epsilon.pdf_
