@@ -1,4 +1,5 @@
 ### Functions for optimal point forecasts (OPFs) of different scoring functions of AE, SE and TADDA
+
 # Functions for computing the OPFs of different loss functions
 # Summary functions for nicer representation of results
 
