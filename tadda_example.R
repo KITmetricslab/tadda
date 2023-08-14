@@ -2,11 +2,17 @@
 # Lotta Rüter
 # lotta.rueter@kit.edu
 
-# First, data of fatalities in Africa and relevant functions are imported and parameters initialized
-# Part 1 determines the optimal window length based on averages losses on training set of task 2
-# Part 2 yields results for chosen window length w = 9 for all of Africa
+### Part 1: Determines optimal window length based on averages losses on training set of task 2
+# Produces "results/average_scores_for_different_window_lengths.csv" which shows that w=5 would be optimal for minimizing TADDA1 via TADDA1_OPF
 
+### Part 2: Yields results for chosen window length w = 9 for all of Africa
+# Computes the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, OPF and lead time s=2,...,7, see "results/individual_predictions_w9.csv" and "results/individual_losses_w9.csv"
+# Produces the central results presented in Table 2, see "results/average_scores_w9.csv"
+# Produces the basis of Table 3, see "results/empirical_quantiles_w9.csv"
 
+# ---------------
+### Part 0: Initialization
+# ---------------
 # load packages
 library(tidyverse) # includes dplyr, required for "reduce" function
 library(rlist) # functions for manipulation of lists
@@ -16,8 +22,8 @@ current_path = rstudioapi::getActiveDocumentContext()$path # get path of this fi
 setwd(dirname(current_path))
 
 # get scoring functions
-source("Illustration/functions.R")
-source("bayes_acts_functions.R")
+source("Theory/functions.R")
+source("Theory/bayes_acts_functions.R")
 
 # read in data
 data_fatalities <- read.csv(paste("Data/fatalities.csv"))[,-1]
