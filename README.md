@@ -32,6 +32,8 @@ contains the files associated with the determination of the optimal window size,
 
 ### **_Simulation_**
 contains code to reproduce illustrative figures and small simulation examples
-
++ _functions.R_ contains functions to compute different scoring functions (AE, SE and variants of TADDA), numerically determine the optimal point forecast (bayes act) given a distribution and to provide text annotation in a plot
++ _illustration.R_ generates Figure 2, Table 1, and supplementary Figure S6
++ _illustrations_proof.R_ generates supplementary Figures S4 and S5
 
 The contents of this repository are likewise under a Creative Commons Attribution-NonCommercial 4.0 International Public License.
