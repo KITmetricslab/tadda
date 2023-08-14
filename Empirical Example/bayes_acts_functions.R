@@ -1,11 +1,14 @@
-### Functions for optimal point forecasts of different scoring functions of AE, SE and TADDA
+### Functions for optimal point forecasts (OPFs) of different scoring functions of AE, SE and TADDA
+# Functions for computing the OPFs of different loss functions
+# Summary functions for nicer representation of results
+
 # Lotta Rüter
 # lotta.rueter@kit.edu
 
 # ----
-### Optimal point forecasts (OPF)
+### Optimal point forecasts (OPFs)
 # ----
-## L1 Optimal point forecasts
+## L1 (Absolute Distance) Optimal Point Forecasts
 OPF_AE <- function(distribution_Y) {
   median(distribution_Y, type = 1)
 }
@@ -75,7 +78,7 @@ OPF_TADDA2_L1 <- function(distribution_Y, epsilon) {
   }
 }
 
-## L2 Optimal point forecasts
+## L2 (Squared Distance) Optimal Point Forecasts
 OPF_SE <- function(distribution_Y) {
   mean(distribution_Y)
 }
@@ -104,7 +107,7 @@ OPF_TADDA1_L2 <- function(distribution_Y, epsilon) {
 }
 
 # ----
-### SUMMARY FUNCTIONS
+### Summary Functions
 # ----
 
 # bayes acts of SE, TADDA1_L1, TADDA2_L1
@@ -115,7 +118,7 @@ bayes_acts <- function(distribution_Y, epsilon) {
   )
 }
 
-# predictions for rolling windows
+# Predictions for rolling windows
 bayes_acts_predictions <- function(data_c = data_country, s = step_ahead, w_length = window_length, eps = epsilon) {
   predictions <- lapply(1:(nrow(data_c)-w_length-s+1), function(w_begin) {
     w_end <- w_begin + w_length - 1
@@ -129,7 +132,7 @@ bayes_acts_predictions <- function(data_c = data_country, s = step_ahead, w_leng
   bind_rows(predictions)
 }
 
-# computes losses with loss function "loss" for all forecasts of forecasting horizon s
+# Computes losses with loss function "loss" for all forecasts of forecasting horizon s
 compute_loss_per_s_and_loss_fun <- function(s, loss, data_all, eps = epsilon, bayes_act_names = OPF_names) {
   true_data_colname <- paste("log_change_s", s, sep = "")
   predictions_colnames <- c(paste(bayes_act_names, s, sep = "_s"), "No_Change")
