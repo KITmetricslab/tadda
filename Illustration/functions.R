@@ -69,14 +69,6 @@ get_bayes_acts <- function(grid_y, grid_epsilon, samples_y, score){
   bayes_acts
 }
 
-# compute the Bayes act from grid_y for a given score under a given forecast distribution (samples_y);
-# without epsilon for AE, SE, TADDA_L1 and TADDA_L2
-get_bayes_acts_wo_epsilon <- function(grid_y, samples_y, score){
-  scores_temp <- sapply(grid_y, function(y_hat) mean(score(y_hat, samples_y)))
-  bayes_act <- grid_y[which.min(scores_temp)]
-  bayes_act
-}
-
 # helper function to add text in a box to a plot:
 text_in_box <- function(x, y, txt, col, cex = 1){
   legend(x, y, txt,
