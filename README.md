@@ -1,6 +1,6 @@
 # Code for the paper _Direction Augmentation in the Evaluation of Armed Conflict Predictions_
 
-Code for the paper _Direction Augmentation in the Evaluation of Armed Conflict Predictions_ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie Schienle published in _International Interactions_ (forthcoming).
+by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie Schienle published in _International Interactions_ (forthcoming).
 
 ## Contents
 ### **Empirical Example**
