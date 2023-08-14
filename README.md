@@ -10,7 +10,7 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 ## Contents
 
 ### **_Empirical Example_** – data and code to reproduce all empirical results
-+ _tadda_example.R_ contains the code for the empirical example in Section 5: computes the optimal window size and generates Table 2 and Table 3
++ _tadda_example.R_ reproduces the empirical results from Section 5, generates the files in the _Results_ folder: computes the optimal window size and generates Table 2 and Table 3
 + _example_mali.R_ generates Figure 3
 + _bayes_acts_functions.R_ contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer represenation of the results
 
