@@ -4,12 +4,14 @@
 ### Part 0: Initialization
 
 ### Part 1: Determines optimal window length based on averages losses on training set of task 2
-# Produces "results/average_scores_for_different_window_lengths.csv" which shows that w=5 would be optimal for minimizing TADDA1 via TADDA1_OPF
+# Produces "Results/average_scores_for_different_window_lengths.csv" which shows that w=5 would be optimal for minimizing TADDA1 via TADDA1_OPF
 
 ### Part 2: Yields results for chosen window length w = 9 for all of Africa
-# Computes the predictions for the log-changes in fatalities and corresponding losses for each African country, month in 395:495, OPF and lead time s=2,...,7, see "results/individual_predictions_w9.csv" and "results/individual_losses_w9.csv"
-# Produces the central results presented in TABLE 2, see "results/average_scores_w9.csv"
-# Produces the basis of TABLE 3, see "results/empirical_quantiles_w9.csv"
+# Computes the predictions for the log-changes in fatalities and corresponding losses
+# for each African country, month in 395:495, OPF and lead time s=2,...,7,
+# see "results/individual_predictions_w9.csv" and "Results/individual_losses_w9.csv"
+# Produces the central results presented in TABLE 2, see "Results/average_scores_w9.csv"
+# Produces the basis of TABLE 3, see "Results/empirical_quantiles_w9.csv"
 
 # Lotta Rüter
 # lotta.rueter@kit.edu
