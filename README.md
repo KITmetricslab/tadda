@@ -25,7 +25,18 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + _average_scores_w9.csv_ contains the central results presented in Table 2
 + _empirical_quantiles_w9.csv_ is the basis of Table 3
 
+**_Figures_**
++ _example_mali.pdf_ Figure 3
+
 ### **_Simulation_** – illustrative figures and small simulation examples
 + _functions.R_ contains functions (i) to compute different scoring functions (AE, SE and variants of TADDA), (ii) to numerically determine the optimal point forecast (Bayes act) given a distribution and (iii) to provide text annotations in a plot
 + _illustration.R_ generates Figure 2, Table 1, and Supplementary Figure S6
 + _illustrations_proof.R_ generates Supplementary Figures S4 and S5
+
+**_Figures_**
++ Figure 2: _illustration.pdf_
++ Figure S4: _F_vs_G_epsilon.pdf_
++ Figure S5: _F_vs_G_minus_epsilon.pdf_
++ Figure S6: _illustration_TADDA2.pdf_
++ _ba_epsilon.pdf_, _curves_scores_L2.pdf_ and _expected_scores.pdf_ illustrate TADDA1 and TADDA2, not included in the paper
+
