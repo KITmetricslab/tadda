@@ -546,7 +546,7 @@ dev.off()
 
 ### additional figure ultimately not used: illustration of L2 scores
 
-pdf("figures/curves_scores_L2.pdf", width = 8, height = 4)
+pdf("Figures/curves_scores_L2.pdf", width = 8, height = 4)
 layout(matrix(c(1, 2, 5,
                 3, 4, 5), byrow = TRUE, ncol = 3), widths = c(2, 2, 1))
 par(mar = c(4.2, 4, 3, 0.5), las = 1)

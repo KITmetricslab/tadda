@@ -36,8 +36,8 @@ F <- psn(x = grid_y, xi = xi, omega = omega, alpha = alpha)
 (med <- median(samples_y))
 
 # evaluate density at epsilon and minus epsilon
-F_minus_epsilon <-  mean(samples_y < -epsilon)
-F_epsilon <-  mean(samples_y < epsilon)
+F_minus_epsilon <- mean(samples_y < -epsilon)
+F_epsilon <- mean(samples_y < epsilon)
 
 # inflate with epsilons:
 n_epsilon <- sum(samples_y < -epsilon)
@@ -65,7 +65,6 @@ abline(v = -epsilon, col = "lightgrey")
 abline(v = epsilon, col = "lightgrey")
 abline(h = 0.5, col = "lightgrey", lty  ="dashed")
 abline(h = F_epsilon/(1 + F_minus_epsilon), col = "lightgrey")
-abline(h = (F_epsilon + F_minus_epsilon)/(1 + F_minus_epsilon), col = "lightgrey")
 abline(v = med, col = "black", lty = "dashed")
 abline(v = med_modified, col = "red", lty  ="dashed")
 
