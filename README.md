@@ -5,6 +5,7 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 ## Contents
 ### **Empirical Example**
 contains data and code to reproduce all empirical results
+
 **Data**
 + The file _data_prep.R_
   * extracts time series of country month fatalities due to state based conflict "ged_best_sb" for each country in Africa
