@@ -17,10 +17,10 @@ current_path = rstudioapi::getActiveDocumentContext()$path # get path of this fi
 setwd(dirname(current_path))
 
 # get scoring functions
-source("../bayes_acts_functions.R")
+source("bayes_acts_functions.R")
 
 # read in data
-data_fatalities <- read.csv(paste("../Data/fatalities.csv"))[,-1]
+data_fatalities <- read.csv(paste("Data/fatalities.csv"))[,-1]
 country_names <- unique(data_fatalities$country_name)
 
 # define week when forecast is issued:
@@ -35,7 +35,7 @@ yl <- c(5, 115)
 
 
 # Plot:
-pdf("figures/example_mali.pdf", width = 9, height = 3.5)
+pdf("Figures/example_mali.pdf", width = 9, height = 3.5)
 
 # structure plot area:
 layout(matrix(1:2, ncol = 2), widths = c(0.6, 0.4))
