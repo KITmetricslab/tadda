@@ -28,12 +28,12 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 **_Figures_**
 + Figure 3: _example_mali.pdf_
 
-### **_Simulation_** – illustrative figures and small simulation examples
+### **_Simulations_** – illustrative figures and small simulation examples
 + _functions.R_ contains functions (i) to compute different scoring functions (AE, SE and variants of TADDA), (ii) to numerically determine the optimal point forecast (Bayes act) given a distribution and (iii) to provide text annotations in a plot
 + _illustration.R_ generates Figure 2, Table 1, and Supplementary Figure S6
 + _illustrations_proof.R_ generates Supplementary Figures S4 and S5
 
-**_Simulation/Figures_**
+**_Simulations/Figures_**
 + Figure 2: _illustration.pdf_
 + Figure S4: _F_vs_G_epsilon.pdf_
 + Figure S5: _F_vs_G_minus_epsilon.pdf_
