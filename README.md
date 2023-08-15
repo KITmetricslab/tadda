@@ -36,6 +36,7 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + `illustrations_proof.R` generates Supplementary Figures S4 and S5.
 
 #### `/Figures`
++ Figure 1: `curves_scores_L1.pdf`
 + Figure 2: `illustration.pdf`
 + Figure S4: `F_vs_G_epsilon.pdf`
 + Figure S5: `F_vs_G_minus_epsilon.pdf`
