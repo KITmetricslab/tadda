@@ -132,7 +132,7 @@ empirical_quantiles <- rbind(round(quantile(data_OPF_SE, (c(1:4, 15:20))/20), 3)
                              round(quantile(data_OPF_TADDA, (c(1:4, 15:20))/20), 3),
                              round(quantile(data_log_change, (c(1:4, 15:20))/20), 3))
 rownames(empirical_quantiles) <- c(OPF_names, "True_log_changes")
-write.csv2(empirical_quantiles, paste("Results/empirical_quantiles_w", window_length, ".csv", sep = ""))
+write.csv(empirical_quantiles, paste("Results/empirical_quantiles_w", window_length, ".csv", sep = ""))
 
 # the following characteristics are computed across all forecasting horizons s=2,...,7
 mean(data_OPF_SE) # average mean forecast
