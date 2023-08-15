@@ -12,9 +12,9 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 ## Contents
 
 ### `Empirical Example` – data and code to reproduce all empirical results
-+ _tadda_example.R_ reproduces the empirical results from Section 5, generates the files in the `Results` folder, computes the optimal window size *w* and generates Tables 2 and 3.
-+ _example_mali.R_ generates Figure 3.
-+ _bayes_acts_functions.R_ contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer representation of the results.
++ `tadda_example.R` reproduces the empirical results from Section 5, generates the files in the `Results` folder, computes the optimal window size *w* and generates Tables 2 and 3.
++ `example_mali.R` generates Figure 3.
++ `bayes_acts_functions.R` contains functions for computing the optimal point forecasts (OPFs) of different scoring functions (AE, SE and variants of TADDA) as well as a summary function for a nicer representation of the results.
 
 #### `/Data`
 + `data_prep.R` (i) extracts time series of country month fatalities due to state based conflict `ged_best_sb` for each country in the data set and (ii) computes true *s = 1, ..., 7* step ahead log-changes for each country and month.
@@ -31,6 +31,7 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + Figure 3: `example_mali.pdf`
 
 ### `Simulations` – illustrative figures and small simulation examples
++ `check_formulas.R` compares OPFs / Bayes acts computed using numerical optimization to the analytical results obtained using the formulas from the manuscript. The agreement between the two indicates that our derivations are correct.
 + `functions.R` contains functions (i) to compute different scoring functions (AE, SE and variants of TADDA), (ii) to numerically determine the optimal point forecast (Bayes act) given a distribution and scoring rule as well as (iii) to provide text annotations in a plot.
 + `illustration.R` generates Figure 2, Table 1, and Supplementary Figure S6.
 + `illustrations_proof.R` generates Supplementary Figures S4 and S5.
@@ -41,5 +42,5 @@ by Johannes Bracher, Lotta Rüter, Fabian Krüger, Sebastian Lerch and Melanie S
 + Figure S4: `F_vs_G_epsilon.pdf`
 + Figure S5: `F_vs_G_minus_epsilon.pdf`
 + Figure S6: `illustration_TADDA2.pdf`
-+ `ba_epsilon.pdf`, `curves_scores_L2.pdf` and `expected_scores.pdf` illustrate TADDA1 and TADDA2, not included in the paper.
++ `ba_numerical_vs_analytical.pdf` (plausibility check of analytical results), `curves_scores_L2.pdf` (illustration of the L2 version of TADDA1) and `expected_scores.pdf` (more detailed version of light grey / red curves from Figure 2) further illustrate TADDA1 and TADDA2, not included in the paper.
 
