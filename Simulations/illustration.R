@@ -1,6 +1,6 @@
 ### Some illustrations and simulation examples on the TADDA scores
 
-# This script generates FIGURE 2, TABLE 1, SUPPLEMENTARY FIGURE S6
+# This script generates FIGURE 1, FIGURE 2, TABLE 1, SUPPLEMENTARY FIGURE S6
 
 # note on nomenclature: this script uses the abbreviation "ba" ("Bayes act") 
 # rather than "opf" ("optimal point forecast")
