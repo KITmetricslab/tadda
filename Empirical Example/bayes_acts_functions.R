@@ -13,68 +13,64 @@ OPF_AE <- function(distribution_Y) {
   median(distribution_Y, type = 1)
 }
 
-OPF_TADDA1_L1 <- function(distribution_Y, epsilon) {
-  m <- median(distribution_Y, type = 1)
+OPF_TADDA1_L1 <- function(distribution_Y, epsilon){
+  pi_minus <- mean(distribution_Y < -epsilon)
+  pi_plus <- mean(distribution_Y > epsilon)
+  m <- median(distribution_Y)
   
-  if(m < (-epsilon)) {
-    F_minus_epsilon <- ecdf(distribution_Y)(-epsilon)
-    F_epsilon <- ecdf(distribution_Y)(epsilon)
-    critical_value <- F_minus_epsilon / (2 - F_epsilon)
-    if (critical_value > 0.5) {
-      return(quantile(distribution_Y, 0.5*(2-F_epsilon), type = 1))
-    } else {
-      return(-epsilon)
-    }
+  if(pi_minus >= 0.5*(1 + pi_plus)){
+    return(quantile(distribution_Y, 0.5*(1 + pi_plus)))
   }
   
-  else if(m <= epsilon) {
+  if(pi_minus > 0.5 & pi_minus < 0.5*(1 + pi_plus)){
+    return(-epsilon)
+  }
+  
+  if(pi_minus <= 0.5 & pi_plus <= 0.5){
     return(m)
   }
   
-  else {
-    F_minus_epsilon <- ecdf(distribution_Y)(-epsilon)
-    F_epsilon <- ecdf(distribution_Y)(epsilon)
-    critical_value <- (F_epsilon - F_minus_epsilon) / (1 + F_minus_epsilon)
-    if (critical_value >= 0.5) {
-      return(epsilon)
-    } else {
-      return(quantile(distribution_Y, 0.5*(1-F_minus_epsilon), type = 1))
-    }
+  if(pi_plus > 0.5 & pi_plus <= 0.5*(1 + pi_minus)){
+    return(epsilon)
+  }
+  
+  if(pi_plus > 0.5*(1 + pi_minus)){
+    return(quantile(distribution_Y, 0.5*(1 - pi_minus)))
   }
 }
 
-OPF_TADDA2_L1 <- function(distribution_Y, epsilon) {
-  m <- median(distribution_Y, type = 1)
+OPF_TADDA2_L1 <- function(distribution_Y, epsilon){
+  pi_minus <- mean(distribution_Y < -epsilon)
+  pi_plus <- mean(distribution_Y > epsilon)
+  Pr_minus_epsilon <- mean(distribution_Y == epsilon)
+  m <- median(distribution_Y)
   
-  # case m < -epsilon
-  if(m < (-epsilon)) {
-    F_minus_epsilon <- ecdf(distribution_Y)(-epsilon)
-    if (F_minus_epsilon > 2/3) {
-      return(quantile(distribution_Y, 0.5*(2-F_minus_epsilon), type = 1))
-    } else {
-      return(-epsilon)
-    }
+  if(pi_minus >= 2/3){
+    return(quantile(distribution_Y, 0.5*(2 - pi_minus)))
   }
   
-  else if(m <= epsilon) {
-    F_minus_epsilon <- ecdf(distribution_Y)(-epsilon)
-    F_epsilon <- ecdf(distribution_Y)(epsilon)
-    if (F_epsilon >= 2 - 3*F_minus_epsilon) {
-      return(-epsilon)
-    } else if (F_epsilon <= 1/3 * (2 - F_minus_epsilon)) {
-      return(epsilon)
-    } else {
-      return(quantile(distribution_Y, 0.5*(2 - F_minus_epsilon + F_epsilon), type = 1))
-    }
+  if(m < -epsilon & pi_minus < 2/3){
+    return(-epsilon)
   }
   
-  else {
-    F_epsilon <- ecdf(distribution_Y)(epsilon)
-    if (F_epsilon >= 1/3) {
-      return(epsilon)
-    } else {
-      return(quantile(distribution_Y, 0.5*(1 - F_epsilon), type = 1))
-    }
+  if(-epsilon <= m & m <= epsilon & pi_minus >= (1 + pi_plus - 2*Pr_minus_epsilon)/3){
+    return(-epsilon)
+  }
+  
+  if(-epsilon <= m & m <= epsilon & pi_plus < (1 + pi_minus)/3 & pi_minus < (1 + pi_plus - 2*Pr_minus_epsilon)/3){
+    return(quantile(distribution_Y, 0.5*(1 - pi_minus + pi_plus)))
+  }
+  
+  if(-epsilon <= m & m <= epsilon & -epsilon < m & m < epsilon & pi_plus >= (1 + pi_minus)/3){
+    return(epsilon)
+  }
+  
+  if(m > epsilon & pi_plus <= 2/3){
+    return(epsilon)
+  }
+  
+  if(pi_plus > 2/3){
+    return(quantile(distribution_Y, 0.5*pi_plus))
   }
 }
 
@@ -82,27 +78,22 @@ OPF_TADDA2_L1 <- function(distribution_Y, epsilon) {
 OPF_SE <- function(distribution_Y) {
   mean(distribution_Y)
 }
-
-
+  
 OPF_TADDA1_L2 <- function(distribution_Y, epsilon) {
+  pi_minus <- mean(distribution_Y < -epsilon)
+  pi_plus <- mean(distribution_Y > epsilon)
   mu <- mean(distribution_Y)
   
-  if(mu < (-epsilon)) {
-    F_epsilon <- ecdf(distribution_Y)(epsilon)
-    denominator <- 2 - F_epsilon
-    return(mu/denominator
-           - epsilon * (1-F_epsilon)/denominator)
+  if(mu < -epsilon){
+    return(mu*(1/(1 + pi_plus)) - epsilon*(pi_plus/(1 + pi_plus)))
   }
   
-  else if(mu <= epsilon){
+  if(mu >= -epsilon & mu <= epsilon){
     return(mu)
   }
   
-  else {
-    F_minus_epsilon <- ecdf(distribution_Y)(-epsilon)
-    denominator <- 1 + F_minus_epsilon
-    return(mu/denominator
-           + epsilon * F_minus_epsilon/denominator)
+  if(mu > epsilon){
+    return(mu*(1/(1 + pi_minus)) + epsilon*(pi_minus/(1 + pi_minus)))
   }
 }
 
