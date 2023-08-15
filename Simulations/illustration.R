@@ -1,6 +1,6 @@
 ### Some illustrations and simulation examples on the TADDA scores
 
-# This script generates FIGURE 2, TABLE 1, SUPPLEMENTARY FIGURE S6
+# This script generates FIGURE 1, FIGURE 2, TABLE 1, SUPPLEMENTARY FIGURE S6
 
 # note on nomenclature: this script uses the abbreviation "ba" ("Bayes act") 
 # rather than "opf" ("optimal point forecast")
@@ -387,13 +387,13 @@ dev.off()
 
 
 #################
-# SUPPLEMENTARY FIGURE S6: Illustration of TADDA2 score:
+# FIGURE 1: Illustration of TADDA1 score:
 
 # set epsilon
 epsilon <- 0.048
 
 ### L1, version TADDA2
-pdf("Figures/illustration_TADDA2.pdf", width = 8, height = 4)
+pdf("Figures/curves_scores_L1.pdf", width = 8, height = 4)
 # structure plot area:
 layout(matrix(c(1, 2, 5,
                 3, 4, 5), byrow = TRUE, ncol = 3), widths = c(2, 2, 1))
@@ -424,7 +424,7 @@ abline(h = 0:10, col = "grey95")
 abline(v = -6:8, col = "grey95")
 box()
 # lines(grid_y, grid_TADDA_a + shift, col = "red", lty = 5)
-lines(grid_y, grid_TADDA_v2_a, col = "red", lty = 4)
+lines(grid_y, grid_TADDA_v1_a, col = "red", lty = 4)
 lines(grid_y, grid_ae_a - shift, col = "black", lty = 3)
 # lines(grid_y, grid_TADDA_v2_a + shift, col = "blue", lty = "twodash")
 
@@ -454,7 +454,7 @@ abline(h = 0:10, col = "grey95")
 abline(v = -6:8, col = "grey95")
 box()
 # lines(grid_y, grid_TADDA_b + shift, col = "red", lty = 5)
-lines(grid_y, grid_TADDA_v2_b, col = "red", lty = 4)
+lines(grid_y, grid_TADDA_v1_b, col = "red", lty = 4)
 lines(grid_y, grid_ae_b - shift, col = "black", lty = 3)
 
 # lines(grid_y, grid_TADDA_v2_b + shift, col = "blue", lty = "twodash")
@@ -489,7 +489,7 @@ abline(h = 0:10, col = "grey95")
 abline(v = -6:8, col = "grey95")
 box()
 # lines(grid_y, grid_TADDA_c + shift, col = "red", lty = 5)
-lines(grid_y, grid_TADDA_v2_c, col = "red", lty = 4)
+lines(grid_y, grid_TADDA_v1_c, col = "red", lty = 4)
 lines(grid_y, grid_ae_c - shift, col = "black", lty = 3)
 
 # lines(grid_y, grid_TADDA_v2_c - shift, col = "blue", lty = "twodash")
@@ -513,6 +513,164 @@ grid_ae_d <- abs(y_hat - grid_y)
 
 
 plot(grid_y, grid_TADDA_v1_d + shift, type = "l", xlab = expression(y),
+     ylab = "", ylim = ylim, xlim = xlim, col = "white")
+mtext(expression(TADDA~with~hat(y) > epsilon~", varying"~y), 3, cex = 0.9, line = 0.3)
+rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
+abline(h = 0:10, col = "grey95")
+abline(v = -6:8, col = "grey95")
+box()
+# lines(grid_y, grid_TADDA_d + shift, col = "red", lty = 5)
+lines(grid_y, grid_TADDA_v1_d, col = "red", lty = 4)
+lines(grid_y, grid_ae_d - shift, col = "black", lty = 3)
+
+abline(v = 0, col = "darkgrey", lty = "dotted")
+abline(v = y_true, lty = "solid", col = "darkgrey")
+abline(v = c(epsilon, -epsilon), lty = "dotted", col = "darkgrey")
+
+text_in_box(0, 0.9*ylim[2], expression(0), col = "darkgrey")
+text_in_box(epsilon, 0.9*ylim[2], expression(epsilon), col = "darkgrey")
+text_in_box(-epsilon,  0.9*ylim[2], expression(-epsilon), col = "darkgrey")
+text_in_box(y_true,  0.5*ylim[2], expression(hat(y)), col = "darkgrey")
+
+# legend in separate panel:
+par(mar = c(0, 0, 0, 0))
+plot(NULL, xlim = 0:1, ylim = 0:1, xlab = "", ylab = "", axes = FALSE)
+legend("center", legend = c(# expression({TADDA[0]}(hat(y), y)),
+  expression({TADDA2[epsilon]}(hat(y), y)),
+  expression(AE(hat(y), y))),
+  bty = "n", cex = 1.2, lty = 5:3, col = c("red", "black"),
+  y.intersp = 1.5)
+dev.off()
+
+
+
+#################
+# SUPPLEMENTARY FIGURE S6: Illustration of TADDA2 score:
+
+# set epsilon
+epsilon <- 0.048
+
+### L1, version TADDA2
+pdf("Figures/illustration_TADDA2.pdf", width = 8, height = 4)
+# structure plot area:
+layout(matrix(c(1, 2, 5,
+                3, 4, 5), byrow = TRUE, ncol = 3), widths = c(2, 2, 1))
+par(mar = c(4.2, 4, 3, 0.5), las = 1)
+xlim <- c(-0.15, 0.15)
+ylim <- c(0, 0.4)
+ylab <- "score" # expression({TADDA^(1)}(hat(y), y))
+shift <- 0.01
+
+# with fixed y, as a function of y_hat
+
+# y in [-epsilon, epsilon]
+grid_y <- seq(from = -0.15, to = 0.25, by = 0.005)
+y_true <- 0.03
+grid_TADDA_a <- TADDA_L1(grid_y, y_true)
+grid_TADDA_v1_a <- TADDA_L1_v1(grid_y, y_true, epsilon = epsilon)
+grid_TADDA_v2_a <- TADDA_L1_v2(grid_y, y_true, epsilon = epsilon)
+grid_ae_a <- abs(grid_y - y_true)
+
+plot(grid_y, grid_TADDA_v2_a, xlab = expression(hat(y)),
+     ylab = ylab, ylim = ylim, xlim = xlim, col = "white")
+mtext(expression(
+  TADDA~with~y%in%paste("[", -epsilon, ",", epsilon, "]"~", varying"~hat(y))
+), 3, cex = 0.9, line = 0.3)
+
+rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
+abline(h = 0:10, col = "grey95")
+abline(v = -6:8, col = "grey95")
+box()
+# lines(grid_y, grid_TADDA_a + shift, col = "red", lty = 5)
+lines(grid_y, grid_TADDA_v2_a, col = "red", lty = 4)
+lines(grid_y, grid_ae_a - shift, col = "black", lty = 3)
+# lines(grid_y, grid_TADDA_v2_a + shift, col = "blue", lty = "twodash")
+
+abline(v = 0, col = "darkgrey", lty = "dotted")
+abline(v = y_true, lty = "solid", col = "darkgrey")
+abline(v = c(epsilon, -epsilon), lty = "dotted", col = "darkgrey")
+
+text_in_box(0, 0.9*ylim[2], expression(0), col = "darkgrey")
+text_in_box(epsilon, 0.9*ylim[2], expression(epsilon), col = "darkgrey")
+text_in_box(-epsilon,  0.9*ylim[2], expression(-epsilon), col = "darkgrey")
+text_in_box(y_true,  0.5*ylim[2], expression(y), col = "darkgrey")
+
+
+# y > epsilon
+y_true <- 0.1
+grid_TADDA_b <- TADDA_L1(grid_y, y_true)
+grid_TADDA_v1_b <- TADDA_L1_v1(grid_y, y_true, epsilon = epsilon)
+grid_TADDA_v2_b <- TADDA_L1_v2(grid_y, y_true, epsilon = epsilon)
+grid_ae_b <- abs(grid_y - y_true)
+
+
+plot(grid_y, grid_TADDA_v2_b + shift, type = "l", xlab = expression(hat(y)),
+     ylab = "", ylim = ylim, xlim = xlim, col = "white")
+mtext(expression(TADDA~with~y > epsilon~", varying"~hat(y)), 3, cex = 0.9, line = 0.3)
+rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
+abline(h = 0:10, col = "grey95")
+abline(v = -6:8, col = "grey95")
+box()
+# lines(grid_y, grid_TADDA_b + shift, col = "red", lty = 5)
+lines(grid_y, grid_TADDA_v2_b, col = "red", lty = 4)
+lines(grid_y, grid_ae_b - shift, col = "black", lty = 3)
+
+# lines(grid_y, grid_TADDA_v2_b + shift, col = "blue", lty = "twodash")
+
+abline(v = 0, col = "darkgrey", lty = "dotted")
+abline(v = y_true, lty = "solid", col = "darkgrey")
+abline(v = c(epsilon, -epsilon), lty = "dotted", col = "darkgrey")
+
+text_in_box(0, 0.9*ylim[2], expression(0), col = "darkgrey")
+text_in_box(epsilon, 0.9*ylim[2], expression(epsilon), col = "darkgrey")
+text_in_box(-epsilon,  0.9*ylim[2], expression(-epsilon), col = "darkgrey")
+text_in_box(y_true,  0.5*ylim[2], expression(y), col = "darkgrey")
+
+
+# with fixed y_hat, as a function of y_hat
+
+# y_hat in [-epsilon, epsilon]
+y_hat <- 0.03
+grid_TADDA_c <- TADDA_L1(y_hat, grid_y)
+grid_TADDA_v1_c <- TADDA_L1_v1(y_hat, grid_y, epsilon = epsilon)
+grid_TADDA_v2_c <- TADDA_L1_v2(y_hat, grid_y, epsilon = epsilon)
+grid_ae_c <- abs(y_hat - grid_y)
+
+plot(grid_y, grid_TADDA_v2_c + shift, type = "l", xlab = expression(y),
+     ylab = ylab, ylim = ylim, xlim = xlim, col = "white")
+mtext(
+  expression(TADDA~with~hat(y)%in%paste("[", -epsilon, ",", epsilon, "]"~", varying"~y)),
+  3, cex = 0.9, line = 0.3)
+
+rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
+abline(h = 0:10, col = "grey95")
+abline(v = -6:8, col = "grey95")
+box()
+# lines(grid_y, grid_TADDA_c + shift, col = "red", lty = 5)
+lines(grid_y, grid_TADDA_v2_c, col = "red", lty = 4)
+lines(grid_y, grid_ae_c - shift, col = "black", lty = 3)
+
+# lines(grid_y, grid_TADDA_v2_c - shift, col = "blue", lty = "twodash")
+
+abline(v = 0, col = "darkgrey", lty = "dotted")
+abline(v = y_hat, lty = "solid", col = "darkgrey")
+abline(v = c(epsilon, -epsilon), lty = "dotted", col = "darkgrey")
+
+text_in_box(0, 0.9*ylim[2], expression(0), col = "darkgrey")
+text_in_box(epsilon, 0.9*ylim[2], expression(epsilon), col = "darkgrey")
+text_in_box(-epsilon,  0.9*ylim[2], expression(-epsilon), col = "darkgrey")
+text_in_box(y_hat,  0.5*ylim[2], expression(hat(y)), col = "darkgrey")
+
+
+# y > epsilon
+y_hat <- 0.1
+grid_TADDA_d <- TADDA_L1(y_hat, grid_y)
+grid_TADDA_v1_d <- TADDA_L1_v1(y_hat, grid_y, epsilon = epsilon)
+grid_TADDA_v2_d <- TADDA_L1_v2(y_hat, grid_y, epsilon = epsilon)
+grid_ae_d <- abs(y_hat - grid_y)
+
+
+plot(grid_y, grid_TADDA_v2_d + shift, type = "l", xlab = expression(y),
      ylab = "", ylim = ylim, xlim = xlim, col = "white")
 mtext(expression(TADDA~with~hat(y) > epsilon~", varying"~y), 3, cex = 0.9, line = 0.3)
 rect(-epsilon, -1, epsilon, 11, col = "grey97", border = NA)
