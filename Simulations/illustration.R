@@ -19,6 +19,8 @@ setwd(dirname(current_path))
 
 # get helper functions
 source("functions.R")
+source("../Empirical Example/bayes_acts_functions.R")
+
 
 # parameters of skew normal:
 xi <- -0.15
@@ -38,8 +40,15 @@ samples_y <- rsn(100000, xi = xi, omega = omega, alpha = alpha)
 
 # compute TADDA Bayes acts:
 grid_y <- seq(from = 0, to = 0.2, by = 0.001) # requires a grid of values to search
+# compute numerically:
 (ba_tadda1 <- get_bayes_acts(grid_y = grid_y, grid_epsilon = epsilon, samples_y = samples_y, score = TADDA_L1_v1))
+# for comparison: analytical solution:
+OPF_TADDA1_L1(samples_y, epsilon)
+# compute numerically:
 (ba_tadda2 <- get_bayes_acts(grid_y = grid_y, grid_epsilon = epsilon, samples_y = samples_y, score = TADDA_L1_v2))
+# for comparison: analytical solution:
+OPF_TADDA2_L1(samples_y, epsilon)
+# analytical and numerical solutions agree
 
 #####################
 ### FIGURE 2 from the manuscript:
