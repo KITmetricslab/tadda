@@ -10,16 +10,16 @@
 # ----
 ## L1 (Absolute Distance) Optimal Point Forecasts
 OPF_AE <- function(distribution_Y) {
-  median(distribution_Y, type = 1)
+  median(distribution_Y, type = 7)
 }
 
 OPF_TADDA1_L1 <- function(distribution_Y, epsilon){
   pi_minus <- mean(distribution_Y < -epsilon)
   pi_plus <- mean(distribution_Y > epsilon)
-  m <- median(distribution_Y)
+  m <- median(distribution_Y, type = 7)
   
   if(pi_minus >= 0.5*(1 + pi_plus)){
-    return(quantile(distribution_Y, 0.5*(1 + pi_plus)))
+    return(quantile(distribution_Y, 0.5*(1 + pi_plus), type = 7))
   }
   
   if(pi_minus > 0.5 & pi_minus < 0.5*(1 + pi_plus)){
@@ -35,7 +35,7 @@ OPF_TADDA1_L1 <- function(distribution_Y, epsilon){
   }
   
   if(pi_plus > 0.5*(1 + pi_minus)){
-    return(quantile(distribution_Y, 0.5*(1 - pi_minus)))
+    return(quantile(distribution_Y, 0.5*(1 - pi_minus), type = 7))
   }
 }
 
@@ -43,10 +43,10 @@ OPF_TADDA2_L1 <- function(distribution_Y, epsilon){
   pi_minus <- mean(distribution_Y < -epsilon)
   pi_plus <- mean(distribution_Y > epsilon)
   Pr_minus_epsilon <- mean(distribution_Y == epsilon)
-  m <- median(distribution_Y)
+  m <- median(distribution_Y, type = 7)
   
   if(pi_minus >= 2/3){
-    return(quantile(distribution_Y, 0.5*(2 - pi_minus)))
+    return(quantile(distribution_Y, 0.5*(2 - pi_minus), type = 7))
   }
   
   if(m < -epsilon & pi_minus < 2/3){
@@ -58,7 +58,7 @@ OPF_TADDA2_L1 <- function(distribution_Y, epsilon){
   }
   
   if(-epsilon <= m & m <= epsilon & pi_plus < (1 + pi_minus)/3 & pi_minus < (1 + pi_plus - 2*Pr_minus_epsilon)/3){
-    return(quantile(distribution_Y, 0.5*(1 - pi_minus + pi_plus)))
+    return(quantile(distribution_Y, 0.5*(1 - pi_minus + pi_plus), type = 7))
   }
   
   if(-epsilon <= m & m <= epsilon & -epsilon < m & m < epsilon & pi_plus >= (1 + pi_minus)/3){
@@ -70,7 +70,7 @@ OPF_TADDA2_L1 <- function(distribution_Y, epsilon){
   }
   
   if(pi_plus > 2/3){
-    return(quantile(distribution_Y, 0.5*pi_plus))
+    return(quantile(distribution_Y, 0.5*pi_plus), type = 7)
   }
 }
 
