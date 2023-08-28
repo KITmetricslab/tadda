@@ -8,7 +8,7 @@
 # ----
 ### Optimal point forecasts (OPFs)
 # ----
-type_no <- 1 # calculation type for quantile estimation
+type_no <- 7 # calculation type for quantile estimation
 
 ## L1 (Absolute Distance) Optimal Point Forecasts
 OPF_AE <- function(distribution_Y) {
